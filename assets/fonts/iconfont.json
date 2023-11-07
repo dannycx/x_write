@@ -1,0 +1,16 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "5173342",
+      "name": "铅笔",
+      "font_class": "qianbi",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    }
+  ]
+}
