@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:x_write/tool/CommonTool.dart';
 import 'package:x_write/tool/CustomIcon.dart';
+import 'package:x_write/ui/WritingPage.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -28,10 +29,7 @@ class _HomePageState extends State<HomePage> {
         constraints: const BoxConstraints.expand(), // 通过ConstrainedBox来确保Stack占满屏幕
         child: Stack(
           children: [
-            const ListTile(
-              title: Text('chat'),
-              trailing: Icon(Icons.arrow_forward_ios_rounded),
-            ),
+            const WritingPage(),
             _leftTool(),
             _rightTool()
           ],
@@ -58,7 +56,7 @@ class _HomePageState extends State<HomePage> {
                 ]),
             child: const Row(
               children: [
-                Icon(CustomIcon.tool_function),
+                Icon(CustomIcon.tool_menu),
                 SizedBox(
                   width: 16,
                 ),
@@ -115,7 +113,7 @@ class _HomePageState extends State<HomePage> {
   OverlayEntry _enetry() {
     return OverlayEntry(builder: (context) {
       return Positioned(
-        width: 260,
+        width: 330,
         height: 48,
         left: _x,
         top: height - 56,
@@ -152,6 +150,14 @@ class _HomePageState extends State<HomePage> {
                     width: 10,
                   ),
                   const Icon(CustomIcon.tool_shape),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  const Icon(CustomIcon.tool_lasso),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  const Icon(CustomIcon.tool_layer),
                   const SizedBox(
                     width: 7,
                   ),

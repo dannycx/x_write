@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/Point.dart';
 import 'package:x_write/model/render/item/Line.dart';
 import 'package:x_write/model/render/model/PaintModel.dart';
 import 'package:x_write/model/render/painter/LinePainter.dart';
+import 'package:x_write/ui/prop/paint_setting_dialog.dart';
 
 /// 书写组件
 class WritingPage extends StatefulWidget {
@@ -27,6 +29,10 @@ class _WritingPageState extends State<WritingPage> {
       onPanEnd: _doneLine, /// 拖动结束
       onPanCancel: _cancel, /// 拖动取消
       onDoubleTap: _clear, /// 双击清除
+      onTap: _showPenSettingDialog, /// 笔属性设置
+      onLongPressStart: _activeEdit, // 长按开始，激活编辑线条
+      onLongPressMoveUpdate: _moveEdit, // 长按移动，移动线条
+      onLongPressUp: _cancelEdit, // 长按抬起，取消编辑
       child: CustomPaint(
         size: MediaQuery.of(context).size,
         painter: LinePainter(model: model),
@@ -63,5 +69,31 @@ class _WritingPageState extends State<WritingPage> {
   }
 
   void _clear() {
+    model.clear();
+  }
+
+  void _activeEdit(LongPressStartDetails details) {
+    model.activeEditLine(Point.fromOffset(details.localPosition));
+  }
+
+  void _moveEdit(LongPressMoveUpdateDetails details) {
+    model.moveEditLine(details.offsetFromOrigin);
+  }
+
+  void _cancelEdit() {
+    model.cancelEditLine();
+  }
+
+  void _showPenSettingDialog() {
+    showCupertinoModalPopup(context: context, builder: (context) => PaintSettingDialog(onColorSelect: _selectColor,
+      onThicknessSelect: _selectThickness, initColor: lineColor, initThickness: strokeWidth,));
+  }
+
+  void _selectColor(Color color) {
+    lineColor = color;
+  }
+
+  void _selectThickness(double thickness) {
+    strokeWidth = thickness;
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// 笔属性面板
-class PenPropPage extends StatefulWidget {
+class PenColorPage extends StatefulWidget {
   /// 颜色列表
   final List<Color> colors;
 
@@ -14,14 +14,14 @@ class PenPropPage extends StatefulWidget {
   /// 默认颜色
   final Color? defColor;
 
-  const PenPropPage({required this.colors, this.radius = 25,
-    required this.defColor, required this.onColorSelect});
+  const PenColorPage({required this.colors, this.radius = 25,
+    this.defColor = Colors.black, required this.onColorSelect});
 
   @override
-  _PenPropPageState createState() => _PenPropPageState();
+  _PenColorPageState createState() => _PenColorPageState();
 }
 
-class _PenPropPageState extends State<PenPropPage> {
+class _PenColorPageState extends State<PenColorPage> {
   int _selectIndex = 0;
   Color get activeColor => widget.colors[_selectIndex];
 
@@ -38,8 +38,8 @@ class _PenPropPageState extends State<PenPropPage> {
     return Container(
       alignment: Alignment.center,
       height: 45,
-      child: Wrap(
-        spacing: 20,
+      child: Wrap( /// 流式布局
+        spacing: 20, /// 主轴方向widget间距
         children: widget.colors.map((color) => GestureDetector(
           onTap: () => _doSelectColor(color),
           child: _buildColorItem(color),

@@ -5,6 +5,9 @@ import '../item/Line.dart';
 
 /// 整合线集,可监听对象（ChangeNotifier）
 class PaintModel extends ChangeNotifier {
+  /// 点距差过滤阈值：比较point与正在画最后一点距离差，大于阈值添加，小于过滤
+  final double tolerance = 18.0;
+
   /// 线集
   final List<Line?> _lines = [];
 
@@ -16,20 +19,51 @@ class PaintModel extends ChangeNotifier {
       _lines.singleWhere((line) => line?.state == PaintState.doing,
           orElse: () => null);
 
+  /// 当前edit状态线
+  Line? get editLine =>
+      _lines.singleWhere((line) => line?.state == PaintState.edit,
+          orElse: () => null);
+
   /// 收集线
   void pushLine(Line line) {
     _lines.add(line);
   }
 
-  /// 移动中收集 Point 放入activeLine
-  void pushPoint(Point point) {
-    if (activeLine == null) {
-      return;
+  /// 移动中收集 Point 放入activeLine，force控制是否过滤点，默认过滤，避免点密集绘制线条不圆滑
+  void pushPoint(Point point, { bool force = false }) {
+    if (activeLine == null) return;
+
+    if (activeLine!.points.isNotEmpty && !force) {
+      if ((point - activeLine!.points.last).distance < tolerance) return;
     }
 
-    activeLine?.points.add(point);
+    activeLine!.points.add(point);
 
     /// 通知画板重绘，避免setState对组件重构
+    notifyListeners();
+  }
+
+  /// 通过路径矩形区域判断是否需要把线置为edit状态，重叠取第一个
+  void activeEditLine(Point point) {
+    List<Line?> lines = _lines.where((line) => line?.path().getBounds().contains(point.toOffset()) ?? false).toList();
+    print('lines.length: ${lines.length}');
+    if (lines.isNotEmpty) {
+      lines[0]?.state = PaintState.edit;
+      lines[0]?.record();
+      notifyListeners();
+    }
+  }
+
+  /// 降edit状态改为done
+  void cancelEditLine() {
+    for (var line in _lines) { line?.state = PaintState.done; }
+    notifyListeners();
+  }
+
+  /// 使用translate移动路径
+  void moveEditLine(Offset offset) {
+    if (editLine == null) return;
+    editLine?.translate(offset);
     notifyListeners();
   }
 
