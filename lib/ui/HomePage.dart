@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:x_write/model/render/data/paint_state.dart';
 import 'package:x_write/tool/CommonTool.dart';
 import 'package:x_write/tool/CustomIcon.dart';
 import 'package:x_write/ui/WritingPage.dart';
+
+import '../model/render/data/write_value_notifier.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -141,7 +144,15 @@ class _HomePageState extends State<HomePage> {
                   ]),
               child: Row(
                 children: [
-                  const Icon(CustomIcon.tool_stylus),
+                  Container(
+                    width: 20,
+                    height: 20,
+                    child: GestureDetector(
+                      onTap: () => bus.emit('opType', OpType.pen),
+                      child: const Icon(CustomIcon.tool_stylus),
+                    ),
+                  ),
+                  // const Icon(CustomIcon.tool_stylus),
                   const SizedBox(
                     width: 10,
                   ),
@@ -149,7 +160,15 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(
                     width: 10,
                   ),
-                  const Icon(CustomIcon.tool_shape),
+                  Container(
+                    width: 20,
+                    height: 20,
+                    child: GestureDetector(
+                      onTap: () => bus.emit('opType', OpType.shape),
+                      child: const Icon(CustomIcon.tool_shape),
+                    ),
+                  ),
+                  // const Icon(CustomIcon.tool_shape),
                   const SizedBox(
                     width: 10,
                   ),

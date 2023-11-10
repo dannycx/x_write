@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/Point.dart';
 
+import '../data/paint_state.dart';
+
 /// Line对象：默认状态：doing，默认颜色：黑色，线宽：1，点集
 class Line {
   List<Point> points = [];
@@ -142,6 +144,3 @@ class Line {
     return path;
   }
 }
-
-/// 三种状态：正在绘制，绘制完成，隐藏，编辑
-enum PaintState { doing, done, hide, edit }
