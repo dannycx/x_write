@@ -3,6 +3,7 @@ import 'package:x_write/model/render/data/paint_state.dart';
 import 'package:x_write/tool/CommonTool.dart';
 import 'package:x_write/tool/CustomIcon.dart';
 import 'package:x_write/ui/WritingPage.dart';
+import 'package:x_write/ui/tool_bar.dart';
 
 import '../model/render/data/write_value_notifier.dart';
 
@@ -29,13 +30,10 @@ class _HomePageState extends State<HomePage> {
     });
     return Scaffold(
       body: ConstrainedBox(
-        constraints: const BoxConstraints.expand(), // 通过ConstrainedBox来确保Stack占满屏幕
+        constraints: const BoxConstraints.expand(),
+        // 通过ConstrainedBox来确保Stack占满屏幕
         child: Stack(
-          children: [
-            const WritingPage(),
-            _leftTool(),
-            _rightTool()
-          ],
+          children: [const WritingPage(), _leftTool(), _rightTool()],
         ),
       ),
     );
@@ -43,73 +41,29 @@ class _HomePageState extends State<HomePage> {
 
   Widget _leftTool() {
     return Positioned(
-        width: 88,
-        height: 48,
-        left: 16,
-        top: height - 56,
-        child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            decoration: const BoxDecoration(
-                color: Colors.white, // 颜色
-                borderRadius: BorderRadiusDirectional.all(Radius.circular(10)), // 圆角
-                boxShadow: [
-                  // 阴影
-                  BoxShadow(color: Colors.grey, offset: Offset(1.0, 1.0), blurRadius: 0.5)
-                ]),
-            child: const Row(
-              children: [
-                Icon(CustomIcon.tool_menu),
-                SizedBox(
-                  width: 16,
-                ),
-                Icon(CustomIcon.tool_decoration),
-              ],
-            )
-        )
+      width: 96,
+      height: 36,
+      left: 16,
+      top: height - 48,
+      child: FunctionMenu(
+        onToolMenu: _onToolMenu,
+        onToolDecoration: _onToolDecoration,
+      ),
     );
   }
 
   Widget _rightTool() {
     return Positioned(
-        width: 170,
-        height: 48,
-        right: 16,
-        top: height - 56,
-        child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            decoration: const BoxDecoration(
-                color: Colors.white, // 颜色
-                borderRadius: BorderRadiusDirectional.all(Radius.circular(10)), // 圆角
-                boxShadow: [
-                  // 阴影
-                  BoxShadow(color: Colors.grey, offset: Offset(1.0, 1.0), blurRadius: 0.5)
-                ]),
-            child: const Row(
-              children: [
-                Icon(Icons.add_circle_outline),
-                SizedBox(
-                  width: 16,
-                ),
-                Icon(Icons.arrow_back_ios),
-                SizedBox(
-                  width: 16,
-                ),
-                Text(
-                  '1/1',
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: Color.fromARGB(255, 43, 43, 43)
-                  ),
-                ),
-                SizedBox(
-                  width: 16,
-                ),
-                Icon(Icons.arrow_forward_ios),
-              ],
-            )
-        )
+      // width: 192,
+      height: 36,
+      right: 16,
+      top: height - 48,
+      child: PageMenu(
+        onToolAdd: _onToolMenu,
+        onToolPre: _onToolMenu,
+        onToolNum: _onToolMenu,
+        onToolNext: _onToolMenu,
+      ),
     );
   }
 
@@ -117,9 +71,9 @@ class _HomePageState extends State<HomePage> {
     return OverlayEntry(builder: (context) {
       return Positioned(
         width: 330,
-        height: 48,
+        height: 36,
         left: _x,
-        top: height - 56,
+        top: height - 48,
         child: GestureDetector(
             onPanUpdate: (details) {
               setState(() {
@@ -137,10 +91,14 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               decoration: const BoxDecoration(
                   color: Colors.white, // 颜色
-                  borderRadius: BorderRadiusDirectional.all(Radius.circular(10)), // 圆角
+                  borderRadius:
+                      BorderRadiusDirectional.all(Radius.circular(10)), // 圆角
                   boxShadow: [
                     // 阴影
-                    BoxShadow(color: Colors.grey, offset: Offset(1.0, 1.0), blurRadius: 0.3)
+                    BoxShadow(
+                        color: Colors.grey,
+                        offset: Offset(1.0, 1.0),
+                        blurRadius: 0.3)
                   ]),
               child: Row(
                 children: [
@@ -184,7 +142,9 @@ class _HomePageState extends State<HomePage> {
                     height: 16,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        border: Border.all(color: const Color.fromARGB(255, 106, 106, 106), width: 0.5),
+                        border: Border.all(
+                            color: const Color.fromARGB(255, 106, 106, 106),
+                            width: 0.5),
                       ),
                     ),
                   ),
@@ -207,7 +167,9 @@ class _HomePageState extends State<HomePage> {
                     height: 16,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        border: Border.all(color: const Color.fromARGB(255, 106, 106, 106), width: 0.5),
+                        border: Border.all(
+                            color: const Color.fromARGB(255, 106, 106, 106),
+                            width: 0.5),
                       ),
                     ),
                   ),
@@ -220,5 +182,13 @@ class _HomePageState extends State<HomePage> {
             )),
       );
     });
+  }
+
+  void _onToolMenu() {
+    print('_onToolMenu');
+  }
+
+  void _onToolDecoration() {
+    print('_onToolDecoration');
   }
 }
