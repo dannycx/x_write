@@ -20,14 +20,15 @@ class FunctionMenu extends StatelessWidget {
         decoration: const BoxDecoration(
             color: Colors.white,
             // 颜色
-            borderRadius: BorderRadiusDirectional.all(Radius.circular(8)),
+            borderRadius: BorderRadiusDirectional.all(Radius.circular(6)),
             // 圆角
             boxShadow: [
               // 阴影
               BoxShadow(
                   color: Colors.grey, offset: Offset(1.0, 1.0), blurRadius: 0.5)
             ]),
-        child: Row(
+        child: Wrap(
+          alignment: WrapAlignment.center,
           children: [
             IconButton(
                 constraints: cts,
@@ -50,11 +51,189 @@ class FunctionMenu extends StatelessWidget {
 }
 
 class ToolMenu extends StatelessWidget {
-  const ToolMenu({super.key});
+  final VoidCallback onToolStylus;
+  final VoidCallback onToolAi;
+  final VoidCallback onToolShape;
+  final VoidCallback onToolLasso;
+  final VoidCallback onToolLayer;
+  final VoidCallback onToolEraser;
+  final VoidCallback onToolUndo;
+  final VoidCallback onToolRedo;
+  final VoidCallback onToolFunction;
+
+  const ToolMenu(
+      {Key? key,
+      required this.onToolStylus,
+      required this.onToolAi,
+      required this.onToolShape,
+      required this.onToolLasso,
+      required this.onToolLayer,
+      required this.onToolEraser,
+      required this.onToolUndo,
+      required this.onToolRedo,
+      required this.onToolFunction})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+      decoration: const BoxDecoration(
+          color: Colors.white, // 颜色
+          borderRadius: BorderRadiusDirectional.all(Radius.circular(6)), // 圆角
+          boxShadow: [
+            // 阴影
+            BoxShadow(
+                color: Colors.grey, offset: Offset(1.0, 1.0), blurRadius: 0.3)
+          ]),
+      child: Row(
+        // alignment: WrapAlignment.center,
+        children: [
+          GestureDetector(
+              onTap: onToolStylus,
+              child: Container(
+                alignment: Alignment.center,
+                height: 36,
+                child: const Icon(
+                  CustomIcon.tool_stylus,
+                  color: Colors.black,
+                ),
+              )),
+          const SizedBox(
+            width: 8,
+          ),
+          GestureDetector(
+              onTap: onToolAi,
+              child: Container(
+                alignment: Alignment.center,
+                height: 36,
+                child: const Icon(
+                  CustomIcon.tool_ai,
+                  color: Colors.black,
+                ),
+              )),
+          const SizedBox(
+            width: 8,
+          ),
+          GestureDetector(
+              onTap: onToolShape,
+              child: Container(
+                alignment: Alignment.center,
+                height: 36,
+                child: const Icon(
+                  CustomIcon.tool_shape,
+                  color: Colors.black,
+                ),
+              )),
+          // const Icon(CustomIcon.tool_shape),
+          const SizedBox(
+            width: 8,
+          ),
+          GestureDetector(
+              onTap: onToolLasso,
+              child: Container(
+                alignment: Alignment.center,
+                height: 36,
+                child: const Icon(
+                  CustomIcon.tool_lasso,
+                  color: Colors.black,
+                ),
+              )),
+          const SizedBox(
+            width: 8,
+          ),
+          GestureDetector(
+              onTap: onToolLayer,
+              child: Container(
+                alignment: Alignment.center,
+                height: 36,
+                child: const Icon(
+                  CustomIcon.tool_layer,
+                  color: Colors.black,
+                ),
+              )),
+          const SizedBox(
+            width: 8,
+          ),
+          SizedBox(
+            height: 16,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: const Color.fromARGB(255, 106, 106, 106),
+                    width: 0.5),
+              ),
+            ),
+          ),
+          const SizedBox(
+            width: 8,
+          ),
+          GestureDetector(
+              onTap: onToolEraser,
+              child: Container(
+                alignment: Alignment.center,
+                height: 36,
+                child: const Icon(
+                  CustomIcon.tool_eraser,
+                  color: Colors.black,
+                ),
+              )),
+          const SizedBox(
+            width: 8,
+          ),
+          GestureDetector(
+              onTap: onToolUndo,
+              child: Container(
+                alignment: Alignment.center,
+                height: 36,
+                child: const Icon(
+                  CustomIcon.tool_undo,
+                  color: Colors.black,
+                ),
+              )),
+          const SizedBox(
+            width: 8,
+          ),
+          GestureDetector(
+              onTap: onToolRedo,
+              child: Container(
+                alignment: Alignment.center,
+                height: 36,
+                child: const Icon(
+                  CustomIcon.tool_redo,
+                  color: Colors.black,
+                ),
+              )),
+          const SizedBox(
+            width: 8,
+          ),
+          SizedBox(
+            height: 16,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: const Color.fromARGB(255, 106, 106, 106),
+                    width: 0.5),
+              ),
+            ),
+          ),
+          const SizedBox(
+            width: 8,
+          ),
+          GestureDetector(
+              onTap: onToolFunction,
+              child: Container(
+                alignment: Alignment.center,
+                height: 36,
+                child: const Icon(
+                  CustomIcon.tool_function,
+                  color: Colors.black,
+                ),
+              )),
+        ],
+      ),
+    );
   }
 }
 
@@ -85,7 +264,7 @@ class _PageMenuState extends State<PageMenu> {
         decoration: const BoxDecoration(
             color: Colors.white,
             // 颜色
-            borderRadius: BorderRadiusDirectional.all(Radius.circular(8)),
+            borderRadius: BorderRadiusDirectional.all(Radius.circular(6)),
             // 圆角
             boxShadow: [
               // 阴影
@@ -112,7 +291,9 @@ class _PageMenuState extends State<PageMenu> {
                     color: Colors.black,
                   ),
                 )),
-            const SizedBox(width: 8,),
+            const SizedBox(
+              width: 8,
+            ),
             GestureDetector(
                 onTap: widget.onToolPre,
                 child: Container(
@@ -123,7 +304,9 @@ class _PageMenuState extends State<PageMenu> {
                     color: Colors.black,
                   ),
                 )),
-            const SizedBox(width: 8,),
+            const SizedBox(
+              width: 8,
+            ),
             GestureDetector(
               onTap: widget.onToolNum,
               child: Container(
@@ -135,7 +318,9 @@ class _PageMenuState extends State<PageMenu> {
                         fontSize: 16, color: Color.fromARGB(255, 43, 43, 43))),
               ),
             ),
-            const SizedBox(width: 8,),
+            const SizedBox(
+              width: 8,
+            ),
             GestureDetector(
                 onTap: widget.onToolNext,
                 child: Container(

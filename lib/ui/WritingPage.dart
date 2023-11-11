@@ -30,14 +30,21 @@ class _WritingPageState extends State<WritingPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
-    bus.on("opTYpe", (type) {
-      print('_WritingPageState type: $type');
-      print('_WritingPageState type: ${type}');
-
-      // opType = type;
+    //注册eventBus事件，监听到变化的时候调用changeColor(color)
+    eventBus.on<OpTypeEvent>().listen((opTypeEvent) {
+      _changeOpType(opTypeEvent.opType);
     });
+    super.initState();
+  }
+
+  _changeOpType(OpType type) {
+    if (mounted) {
+      // 若不对mounted进行判断，会报错 setState() called after dispose()
+      setState(() {
+        opType = type;
+        print('opType: $opType');
+      });
+    }
   }
 
   @override
@@ -63,7 +70,7 @@ class _WritingPageState extends State<WritingPage> {
   void dispose() {
     // 释放可监听对象PaintModel
     model.dispose();
-    bus.off('opType');
+    eventBus.destroy();
     super.dispose();
   }
 

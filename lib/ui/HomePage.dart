@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/paint_state.dart';
+import 'package:x_write/model/render/data/write_value_notifier.dart';
 import 'package:x_write/tool/CommonTool.dart';
-import 'package:x_write/tool/CustomIcon.dart';
 import 'package:x_write/ui/WritingPage.dart';
 import 'package:x_write/ui/tool_bar.dart';
-
-import '../model/render/data/write_value_notifier.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -70,7 +68,7 @@ class _HomePageState extends State<HomePage> {
   OverlayEntry _enetry() {
     return OverlayEntry(builder: (context) {
       return Positioned(
-        width: 330,
+        width: 316,
         height: 36,
         left: _x,
         top: height - 48,
@@ -81,104 +79,21 @@ class _HomePageState extends State<HomePage> {
                 // _y += details.delta.dy;
                 if (_x < 124) {
                   _x = 124;
-                } else if (_x > width - 480) {
-                  _x = width - 480;
+                } else if (_x > width - 530) {
+                  _x = width - 530;
                 }
               });
             },
-            child: Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              decoration: const BoxDecoration(
-                  color: Colors.white, // 颜色
-                  borderRadius:
-                      BorderRadiusDirectional.all(Radius.circular(10)), // 圆角
-                  boxShadow: [
-                    // 阴影
-                    BoxShadow(
-                        color: Colors.grey,
-                        offset: Offset(1.0, 1.0),
-                        blurRadius: 0.3)
-                  ]),
-              child: Row(
-                children: [
-                  Container(
-                    width: 20,
-                    height: 20,
-                    child: GestureDetector(
-                      onTap: () => bus.emit('opType', OpType.pen),
-                      child: const Icon(CustomIcon.tool_stylus),
-                    ),
-                  ),
-                  // const Icon(CustomIcon.tool_stylus),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Icon(CustomIcon.tool_ai),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Container(
-                    width: 20,
-                    height: 20,
-                    child: GestureDetector(
-                      onTap: () => bus.emit('opType', OpType.shape),
-                      child: const Icon(CustomIcon.tool_shape),
-                    ),
-                  ),
-                  // const Icon(CustomIcon.tool_shape),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Icon(CustomIcon.tool_lasso),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Icon(CustomIcon.tool_layer),
-                  const SizedBox(
-                    width: 7,
-                  ),
-                  Container(
-                    height: 16,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                            color: const Color.fromARGB(255, 106, 106, 106),
-                            width: 0.5),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 7,
-                  ),
-                  const Icon(CustomIcon.tool_eraser),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Icon(CustomIcon.tool_undo),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Icon(CustomIcon.tool_redo),
-                  const SizedBox(
-                    width: 7,
-                  ),
-                  Container(
-                    height: 16,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                            color: const Color.fromARGB(255, 106, 106, 106),
-                            width: 0.5),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 7,
-                  ),
-                  const Icon(CustomIcon.tool_function)
-                ],
-              ),
+            child: ToolMenu(
+              onToolStylus: _onToolStylus,
+              onToolAi: _onToolAi,
+              onToolShape: _onToolShape,
+              onToolLasso: _onToolMenu,
+              onToolLayer: _onToolMenu,
+              onToolEraser: _onToolMenu,
+              onToolUndo: _onToolMenu,
+              onToolRedo: _onToolMenu,
+              onToolFunction: _onToolMenu,
             )),
       );
     });
@@ -190,5 +105,17 @@ class _HomePageState extends State<HomePage> {
 
   void _onToolDecoration() {
     print('_onToolDecoration');
+  }
+
+  void _onToolStylus() {
+    eventBus.fire(OpTypeEvent(opType: OpType.pen));
+  }
+
+  void _onToolAi() {
+    print('_onToolDecoration');
+  }
+
+  void _onToolShape() {
+    eventBus.fire(OpTypeEvent(opType: OpType.shape));
   }
 }
