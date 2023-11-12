@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/Point.dart';
+import 'package:x_write/model/render/data/write_path.dart';
 
 import '../data/paint_state.dart';
 
@@ -98,30 +99,32 @@ class Shape {
         canvas.drawPath(_path, paint);
         break;
       case ShapeType.arrow: // 箭头
-        _path.reset();
-        _path.moveTo(left, top);
-        _path.lineTo(left + width, top + height);
-        Path arrow = Path();
         double firstX = points[0].x;
         double firstY = points[0].y;
         double lastX = points[points.length - 1].x;
         double lastY = points[points.length - 1].y;
-        if (firstX > lastX) {
-          arrow.moveTo(lastX + 5, lastY);
-          arrow.lineTo(lastX, lastY);
-          arrow.lineTo(lastX + 5, lastY + 10);
-        } else {
-          arrow.moveTo(lastX - 5, lastY - 5);
-          arrow.lineTo(lastX, lastY);
-          arrow.lineTo(lastX - 5, lastY + 5);
-        }
-        canvas.drawPath(_path, paint);
-        canvas.drawPath(arrow, paint);
+        Size portSize = const Size(10, 10);
+        ArrowPath arrowPath = ArrowPath(
+            head: PortPath(
+                center: Offset(firstX, firstY),
+                size: portSize,
+                portPath: const NullPortPath()),
+            tail: PortPath(
+                center: Offset(lastX, lastY),
+                size: portSize,
+                portPath: const ThreeAnglePortPath()));
+
+        paint.style = PaintingStyle.fill;
+        canvas.drawPath(arrowPath.fromPath(), paint);
         break;
       case ShapeType.line: // 线
         _path.reset();
-        _path.moveTo(left, top);
-        _path.lineTo(left + width, top + height);
+        double firstX = points[0].x;
+        double firstY = points[0].y;
+        double lastX = points[points.length - 1].x;
+        double lastY = points[points.length - 1].y;
+        _path.moveTo(firstX, firstY);
+        _path.lineTo(lastX, lastY);
         canvas.drawPath(_path, paint);
         break;
       default:
@@ -159,31 +162,13 @@ class Shape {
   Rect? fromRect() {
     if (points.isEmpty) return null;
 
-    double left = points[0].x;
-    double top = points[0].y;
-    double right = points[points.length - 1].x;
-    double bottom = points[points.length - 1].y;
+    double firstX = points[0].x;
+    double firstY = points[0].y;
+    double lastX = points[points.length - 1].x;
+    double lastY = points[points.length - 1].y;
 
-    if (left > right) {
-      double swap = left;
-      left = right;
-      right = swap;
-    }
-
-    if (top > bottom) {
-      double swap = top;
-      top = bottom;
-      bottom = swap;
-    }
-
-    double width = right - left;
-    double height = bottom - top;
-    double radiusX = width / 2;
-    double radiusY = height / 2;
-    return Rect.fromCenter(
-        center: Offset(left + radiusX, top + radiusY),
-        width: width,
-        height: height);
+    return Rect.fromLTRB(min(firstX, lastX), min(firstY, lastY),
+        max(firstX, lastX), max(firstY, lastY));
   }
 
   /// 最大最小点图形绘制区域
