@@ -20,7 +20,11 @@ class FunctionMenu extends StatelessWidget {
         decoration: const BoxDecoration(
             color: Colors.white,
             // 颜色
-            borderRadius: BorderRadiusDirectional.all(Radius.circular(6)),
+            borderRadius: BorderRadiusDirectional.only(
+                topStart: Radius.circular(4),
+                topEnd: Radius.circular(4),
+                bottomStart: Radius.zero,
+                bottomEnd: Radius.zero),
             // 圆角
             boxShadow: [
               // 阴影
@@ -81,7 +85,7 @@ class ToolMenu extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
       decoration: const BoxDecoration(
           color: Colors.white, // 颜色
-          borderRadius: BorderRadiusDirectional.all(Radius.circular(6)), // 圆角
+          borderRadius: BorderRadiusDirectional.all(Radius.circular(4)), // 圆角
           boxShadow: [
             // 阴影
             BoxShadow(
@@ -140,19 +144,19 @@ class ToolMenu extends StatelessWidget {
                   color: Colors.black,
                 ),
               )),
-          const SizedBox(
-            width: 8,
-          ),
-          GestureDetector(
-              onTap: onToolLayer,
-              child: Container(
-                alignment: Alignment.center,
-                height: 36,
-                child: const Icon(
-                  CustomIcon.tool_layer,
-                  color: Colors.black,
-                ),
-              )),
+          // const SizedBox(
+          //   width: 8,
+          // ),
+          // GestureDetector(
+          //     onTap: onToolLayer,
+          //     child: Container(
+          //       alignment: Alignment.center,
+          //       height: 36,
+          //       child: const Icon(
+          //         CustomIcon.tool_layer,
+          //         color: Colors.black,
+          //       ),
+          //     )),
           const SizedBox(
             width: 8,
           ),
@@ -264,7 +268,7 @@ class _PageMenuState extends State<PageMenu> {
         decoration: const BoxDecoration(
             color: Colors.white,
             // 颜色
-            borderRadius: BorderRadiusDirectional.all(Radius.circular(6)),
+            borderRadius: BorderRadiusDirectional.all(Radius.circular(4)),
             // 圆角
             boxShadow: [
               // 阴影

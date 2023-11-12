@@ -11,8 +11,9 @@ class PaintModel extends ChangeNotifier {
   final double tolerance = 18.0;
 
   OpType opType = OpType.pen;
+  ShapeType shapeType = ShapeType.circle;
 
-  PaintModel({this.opType = OpType.pen});
+  PaintModel({this.opType = OpType.pen, this.shapeType = ShapeType.circle});
 
   /// 线集
   final List<Line?> _lines = [];
@@ -47,8 +48,10 @@ class PaintModel extends ChangeNotifier {
           orElse: () => null);
 
   /// 追加子项
-  void pushItem(DragDownDetails details, OpType type, Color color, double strokeWidth) {
-    opType = type;
+  void pushItem(
+      DragDownDetails details, OpType oType, ShapeType sType, Color color, double strokeWidth) {
+    opType = oType;
+    shapeType = sType;
     switch (opType) {
       case OpType.pen:
       case OpType.highlight:
@@ -59,8 +62,8 @@ class PaintModel extends ChangeNotifier {
         _lines.add(line);
         break;
       case OpType.shape:
-      // 收集形状
-        Shape shape = Shape(color: color);
+        // 收集形状
+        Shape shape = Shape(color: color, shapeType: shapeType);
         _shapes.add(shape);
         break;
       default:
@@ -69,7 +72,7 @@ class PaintModel extends ChangeNotifier {
   }
 
   /// 追加点至子项
-  void pushPointItem(Point point, { bool force = false }) {
+  void pushPointItem(Point point, {bool force = false}) {
     switch (opType) {
       case OpType.pen:
       case OpType.highlight:
@@ -155,10 +158,14 @@ class PaintModel extends ChangeNotifier {
 
   /// 清屏
   void clearItem() {
-    for (var line in _lines) {line?.points.clear();}
+    for (var line in _lines) {
+      line?.points.clear();
+    }
     _lines.clear();
 
-    for (var shape in _shapes) {shape?.points.clear();}
+    for (var shape in _shapes) {
+      shape?.points.clear();
+    }
     _shapes.clear();
 
     /// 通知画板重绘，避免setState对组件重构
@@ -177,7 +184,7 @@ class PaintModel extends ChangeNotifier {
   }
 
   /// 移动中收集 Point 放入activeLine，force控制是否过滤点，默认过滤，避免点密集绘制线条不圆滑
-  void pushPointLine(Point point, { bool force = false }) {
+  void pushPointLine(Point point, {bool force = false}) {
     if (activeLine == null) return;
 
     if (activeLine!.points.isNotEmpty && !force) {
@@ -192,7 +199,10 @@ class PaintModel extends ChangeNotifier {
 
   /// 通过路径矩形区域判断是否需要把线置为edit状态，重叠取第一个
   void activeEditLine(Point point) {
-    List<Line?> lines = _lines.where((line) => line?.path().getBounds().contains(point.toOffset()) ?? false).toList();
+    List<Line?> lines = _lines
+        .where((line) =>
+            line?.path().getBounds().contains(point.toOffset()) ?? false)
+        .toList();
     print('lines.length: ${lines.length}');
     if (lines.isNotEmpty) {
       lines[0]?.state = PaintState.edit;
@@ -203,7 +213,9 @@ class PaintModel extends ChangeNotifier {
 
   /// 降edit状态改为done
   void cancelEditLine() {
-    for (var line in _lines) { line?.state = PaintState.done; }
+    for (var line in _lines) {
+      line?.state = PaintState.done;
+    }
     notifyListeners();
   }
 
@@ -229,7 +241,7 @@ class PaintModel extends ChangeNotifier {
   }
 
   /// 移动中收集 Point 放入activeShape，force控制是否过滤点，默认过滤，避免点过密，计算增加
-  void pushPointShape(Point point, { bool force = false }) {
+  void pushPointShape(Point point, {bool force = false}) {
     if (activeShape == null) return;
 
     if (activeShape!.points.isNotEmpty && !force) {
@@ -244,7 +256,9 @@ class PaintModel extends ChangeNotifier {
 
   /// 通过路径矩形区域判断是否需要把线置为edit状态，重叠取第一个
   void activeEditShape(Point point) {
-    List<Shape?> shapes = _shapes.where((shape) => shape?.rect()?.contains(point.toOffset()) ?? false).toList();
+    List<Shape?> shapes = _shapes
+        .where((shape) => shape?.rect()?.contains(point.toOffset()) ?? false)
+        .toList();
     print('shapes.length: ${shapes.length}');
     if (shapes.isNotEmpty) {
       shapes[0]?.state = PaintState.edit;
@@ -255,7 +269,9 @@ class PaintModel extends ChangeNotifier {
 
   /// 降edit状态改为done
   void cancelEditShape() {
-    for (var shape in _shapes) { shape?.state = PaintState.done; }
+    for (var shape in _shapes) {
+      shape?.state = PaintState.done;
+    }
     notifyListeners();
   }
 

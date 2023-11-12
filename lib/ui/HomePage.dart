@@ -3,6 +3,8 @@ import 'package:x_write/model/render/data/paint_state.dart';
 import 'package:x_write/model/render/data/write_value_notifier.dart';
 import 'package:x_write/tool/CommonTool.dart';
 import 'package:x_write/ui/WritingPage.dart';
+import 'package:x_write/ui/prop/PenPropPage.dart';
+import 'package:x_write/ui/prop/ShapePropPage.dart';
 import 'package:x_write/ui/tool_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,6 +20,12 @@ class _HomePageState extends State<HomePage> {
   double width = CommonTool.width;
   double height = CommonTool.height;
 
+  /// 是否显示工具属性page
+  bool _penPropPageVisible = false;
+  bool _shapePropPageVisible = false;
+
+  String _shpeType = "circle";
+
   @override
   Widget build(BuildContext context) {
     // MediaQueryData date = MediaQuery.of(context);
@@ -31,7 +39,14 @@ class _HomePageState extends State<HomePage> {
         constraints: const BoxConstraints.expand(),
         // 通过ConstrainedBox来确保Stack占满屏幕
         child: Stack(
-          children: [const WritingPage(), _leftTool(), _rightTool()],
+          children: [
+            const WritingPage(),
+            _leftTool(),
+            _rightTool(),
+            _penPropPage(),
+            _shapePropPage(),
+            Positioned(left: 0, top: 0, child: Text(_shpeType))
+          ],
         ),
       ),
     );
@@ -57,10 +72,10 @@ class _HomePageState extends State<HomePage> {
       right: 16,
       top: height - 48,
       child: PageMenu(
-        onToolAdd: _onToolMenu,
-        onToolPre: _onToolMenu,
-        onToolNum: _onToolMenu,
-        onToolNext: _onToolMenu,
+        onToolAdd: () {},
+        onToolPre: () {},
+        onToolNum: () {},
+        onToolNext: () {},
       ),
     );
   }
@@ -68,7 +83,7 @@ class _HomePageState extends State<HomePage> {
   OverlayEntry _enetry() {
     return OverlayEntry(builder: (context) {
       return Positioned(
-        width: 316,
+        // width: 316,
         height: 36,
         left: _x,
         top: height - 48,
@@ -79,8 +94,8 @@ class _HomePageState extends State<HomePage> {
                 // _y += details.delta.dy;
                 if (_x < 124) {
                   _x = 124;
-                } else if (_x > width - 530) {
-                  _x = width - 530;
+                } else if (_x > width - 484) {
+                  _x = width - 484;
                 }
               });
             },
@@ -88,15 +103,59 @@ class _HomePageState extends State<HomePage> {
               onToolStylus: _onToolStylus,
               onToolAi: _onToolAi,
               onToolShape: _onToolShape,
-              onToolLasso: _onToolMenu,
-              onToolLayer: _onToolMenu,
-              onToolEraser: _onToolMenu,
-              onToolUndo: _onToolMenu,
-              onToolRedo: _onToolMenu,
-              onToolFunction: _onToolMenu,
+              onToolLasso: _onToolLasso,
+              onToolLayer: _onToolLayer,
+              onToolEraser: _onToolEraser,
+              onToolUndo: _onToolUndo,
+              onToolRedo: _onToolRedo,
+              onToolFunction: _onToolFunction,
             )),
       );
     });
+  }
+
+  Widget _penPropPage() {
+    return Visibility(
+        // 显示隐藏
+        visible: _penPropPageVisible,
+        // 隐藏时是否保持占位
+        maintainState: false,
+        // 隐藏时是否保存动态状态
+        maintainAnimation: false,
+        // 隐藏时是否保存子组件所占空间大小，不会消耗过多的性能
+        maintainSize: false,
+        child: Positioned(
+          width: 316,
+          height: 36,
+          left: _x,
+          top: height - 84,
+          child: PenPropPage(
+            onToolPenProp: (penType) {
+              eventBus.fire(OpTypeEvent(opType: penType));
+            },
+          ),
+        ));
+  }
+
+  Widget _shapePropPage() {
+    return Visibility(
+        // 显示隐藏
+        visible: _shapePropPageVisible,
+        // 隐藏时是否保持占位
+        maintainState: false,
+        // 隐藏时是否保存动态状态
+        maintainAnimation: false,
+        // 隐藏时是否保存子组件所占空间大小，不会消耗过多的性能
+        maintainSize: false,
+        child: Positioned(
+          width: 316,
+          height: 36,
+          left: _x,
+          top: height - 84,
+          child: ShapePropPage(
+            onToolShapeProp: _onToolShapeProp,
+          ),
+        ));
   }
 
   void _onToolMenu() {
@@ -108,6 +167,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onToolStylus() {
+    _hidePropPage();
+    setState(() {
+      _penPropPageVisible = true;
+    });
     eventBus.fire(OpTypeEvent(opType: OpType.pen));
   }
 
@@ -116,6 +179,45 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onToolShape() {
+    _hidePropPage();
+    setState(() {
+      _shapePropPageVisible = true;
+    });
     eventBus.fire(OpTypeEvent(opType: OpType.shape));
+  }
+
+  void _onToolLasso() {
+    eventBus.fire(OpTypeEvent(opType: OpType.shape));
+  }
+
+  void _onToolLayer() {
+    eventBus.fire(OpTypeEvent(opType: OpType.shape));
+  }
+
+  void _onToolEraser() {
+    eventBus.fire(OpTypeEvent(opType: OpType.shape));
+  }
+
+  void _onToolUndo() {
+    eventBus.fire(OpTypeEvent(opType: OpType.shape));
+  }
+
+  void _onToolRedo() {
+    eventBus.fire(OpTypeEvent(opType: OpType.shape));
+  }
+
+  void _onToolFunction() {
+    eventBus.fire(OpTypeEvent(opType: OpType.shape));
+  }
+
+  _onToolShapeProp(ShapeType shapeType) {
+    eventBus.fire(ShapeTypeEvent(shapeType: shapeType));
+  }
+
+  void _hidePropPage() {
+    setState(() {
+      _penPropPageVisible = false;
+      _shapePropPageVisible = false;
+    });
   }
 }

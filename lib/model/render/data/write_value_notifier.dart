@@ -16,3 +16,10 @@ class OpTypeEvent {
 
   OpTypeEvent({required this.opType});
 }
+
+/// 图形类型事件
+class ShapeTypeEvent {
+  ShapeType shapeType;
+
+  ShapeTypeEvent({required this.shapeType});
+}

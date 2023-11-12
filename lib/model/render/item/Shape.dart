@@ -12,15 +12,23 @@ class Shape {
   PaintState state;
   Color color;
   PaintingStyle paintingStyle;
-  ShapeType shapeType = ShapeType.circle;
+  ShapeType shapeType;
 
   // 记录该线进入编辑状态时的路径，通过record()赋值，translate()通过偏移量offset更新路径，实现移动效果
   Rect? _recordRect;
 
   // 绘制路径
-  Rect? _shapeRect = Rect.fromCenter(center: const Offset(0, 0), width: 0, height: 0);
+  Rect? _shapeRect =
+      Rect.fromCenter(center: const Offset(0, 0), width: 0, height: 0);
 
-  Shape({this.color = Colors.black, this.state = PaintState.doing, this.paintingStyle = PaintingStyle.stroke});
+  // 绘制路径
+  final Path _path = Path();
+
+  Shape(
+      {this.color = Colors.black,
+      this.state = PaintState.doing,
+      this.paintingStyle = PaintingStyle.stroke,
+      this.shapeType = ShapeType.circle});
 
   // 赋值_recordPath
   void record() {
@@ -55,9 +63,66 @@ class Shape {
     double left = _shapeRect?.left ?? 0;
     double top = _shapeRect?.top ?? 0;
     double radius = width / 2;
-    switch(shapeType) {
-      case ShapeType.circle:
+    switch (shapeType) {
+      case ShapeType.circle: // 圆
         canvas.drawCircle(Offset(left + radius, top + radius), radius, paint);
+        break;
+      case ShapeType.oval: // 椭圆
+        canvas.drawOval(_shapeRect!, paint);
+        break;
+      case ShapeType.square: // 矩形
+        canvas.drawRect(_shapeRect!, paint);
+        break;
+      case ShapeType.regularTriangle: // 等腰三角
+        _path.reset();
+        _path.moveTo(left + radius, top);
+        _path.lineTo(left, top + height);
+        _path.lineTo(left + width, top + height);
+        _path.lineTo(left + radius, top);
+        canvas.drawPath(_path, paint);
+        break;
+      case ShapeType.rightTriangle: // 直角三角
+        _path.reset();
+        _path.moveTo(left, top);
+        _path.lineTo(left, top + height);
+        _path.lineTo(left + width, top + height);
+        _path.lineTo(left, top);
+        canvas.drawPath(_path, paint);
+        break;
+      case ShapeType.star: // 五角星
+        _path.reset();
+        _path.moveTo(left, top);
+        _path.lineTo(left, top + height);
+        _path.lineTo(left + width, top + height);
+        _path.lineTo(left, top);
+        canvas.drawPath(_path, paint);
+        break;
+      case ShapeType.arrow: // 箭头
+        _path.reset();
+        _path.moveTo(left, top);
+        _path.lineTo(left + width, top + height);
+        Path arrow = Path();
+        double firstX = points[0].x;
+        double firstY = points[0].y;
+        double lastX = points[points.length - 1].x;
+        double lastY = points[points.length - 1].y;
+        if (firstX > lastX) {
+          arrow.moveTo(lastX + 5, lastY);
+          arrow.lineTo(lastX, lastY);
+          arrow.lineTo(lastX + 5, lastY + 10);
+        } else {
+          arrow.moveTo(lastX - 5, lastY - 5);
+          arrow.lineTo(lastX, lastY);
+          arrow.lineTo(lastX - 5, lastY + 5);
+        }
+        canvas.drawPath(_path, paint);
+        canvas.drawPath(arrow, paint);
+        break;
+      case ShapeType.line: // 线
+        _path.reset();
+        _path.moveTo(left, top);
+        _path.lineTo(left + width, top + height);
+        canvas.drawPath(_path, paint);
         break;
       default:
         break;
@@ -71,7 +136,7 @@ class Shape {
 
       double editWidth = width;
       double editHeight = height;
-      switch(shapeType) {
+      switch (shapeType) {
         case ShapeType.circle:
           double maxValue = max(editWidth, editHeight);
           editWidth = maxValue;
@@ -81,15 +146,48 @@ class Shape {
           break;
       }
 
-      canvas.drawRect(Rect.fromCenter(
-          center: Offset(left + radius, top + radius),
-          width: editWidth + strokeWidth,
-          height: editHeight + strokeWidth), editPaint);
+      canvas.drawRect(
+          Rect.fromCenter(
+              center: Offset(left + radius, top + radius),
+              width: editWidth + strokeWidth,
+              height: editHeight + strokeWidth),
+          editPaint);
     }
   }
 
   /// 图形绘制区域
   Rect? fromRect() {
+    if (points.isEmpty) return null;
+
+    double left = points[0].x;
+    double top = points[0].y;
+    double right = points[points.length - 1].x;
+    double bottom = points[points.length - 1].y;
+
+    if (left > right) {
+      double swap = left;
+      left = right;
+      right = swap;
+    }
+
+    if (top > bottom) {
+      double swap = top;
+      top = bottom;
+      bottom = swap;
+    }
+
+    double width = right - left;
+    double height = bottom - top;
+    double radiusX = width / 2;
+    double radiusY = height / 2;
+    return Rect.fromCenter(
+        center: Offset(left + radiusX, top + radiusY),
+        width: width,
+        height: height);
+  }
+
+  /// 最大最小点图形绘制区域
+  Rect? fromRectMax() {
     if (points.isEmpty) return null;
 
     double left = points[0].x;
@@ -118,6 +216,9 @@ class Shape {
     double height = bottom - top;
     double radiusX = width / 2;
     double radiusY = height / 2;
-    return Rect.fromCenter(center: Offset(left + radiusX, top + radiusY), width: width, height: height);
+    return Rect.fromCenter(
+        center: Offset(left + radiusX, top + radiusY),
+        width: width,
+        height: height);
   }
 }
