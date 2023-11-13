@@ -24,13 +24,8 @@ class _HomePageState extends State<HomePage> {
   bool _penPropPageVisible = false;
   bool _shapePropPageVisible = false;
 
-  String _shpeType = "circle";
-
   @override
   Widget build(BuildContext context) {
-    // MediaQueryData date = MediaQuery.of(context);
-    // width = date.size.width;
-    // height = date.size.height;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Overlay.of(context).insert(_enetry());
     });
@@ -45,7 +40,6 @@ class _HomePageState extends State<HomePage> {
             _rightTool(),
             _penPropPage(),
             _shapePropPage(),
-            Positioned(left: 0, top: 0, child: Text(_shpeType))
           ],
         ),
       ),
@@ -54,7 +48,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _leftTool() {
     return Positioned(
-      width: 96,
+      // width: 96,
       height: 36,
       left: 16,
       top: height - 48,
@@ -125,13 +119,14 @@ class _HomePageState extends State<HomePage> {
         // 隐藏时是否保存子组件所占空间大小，不会消耗过多的性能
         maintainSize: false,
         child: Positioned(
-          width: 316,
+          // width: 316,
           height: 36,
           left: _x,
-          top: height - 84,
+          top: height - 90,
           child: PenPropPage(
-            onToolPenProp: (penType) {
+            onToolPenProp: (penType, color, thickness) {
               eventBus.fire(OpTypeEvent(opType: penType));
+              eventBus.fire(PenPropEvent(color: color, thickness: thickness));
             },
           ),
         ));
@@ -151,7 +146,7 @@ class _HomePageState extends State<HomePage> {
           width: 316,
           height: 36,
           left: _x,
-          top: height - 84,
+          top: height - 90,
           child: ShapePropPage(
             onToolShapeProp: _onToolShapeProp,
           ),

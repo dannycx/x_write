@@ -31,6 +31,8 @@ class _WritingPageState extends State<WritingPage> {
   /// 粗细
   double strokeWidth = 1;
 
+  double _forcePress = 0;
+
   @override
   void initState() {
     //注册eventBus事件，监听到变化的时候调用changeColor(color)
@@ -39,6 +41,9 @@ class _WritingPageState extends State<WritingPage> {
     });
     eventBus.on<ShapeTypeEvent>().listen((shapeTypeEvent) {
       _changeShapeType(shapeTypeEvent.shapeType);
+    });
+    eventBus.on<PenPropEvent>().listen((penPropEvent) {
+      _changePenProp(penPropEvent);
     });
     super.initState();
   }
@@ -63,33 +68,50 @@ class _WritingPageState extends State<WritingPage> {
     }
   }
 
+  _changePenProp(PenPropEvent penPropEvent) {
+    if (mounted) {
+      // 若不对mounted进行判断，会报错 setState() called after dispose()
+      setState(() {
+        lineColor = penPropEvent.color;
+        strokeWidth = penPropEvent.thickness;
+        print('penPropEvent: $penPropEvent');
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      /// 按下
       onPanDown: _initItemDate,
 
-      /// 按下
+      /// 拖动收集点
       onPanUpdate: _collectPoint,
 
-      /// 拖动收集点
+      /// 拖动结束
       onPanEnd: _doneItem,
 
-      /// 拖动结束
+      /// 拖动取消
       onPanCancel: _cancel,
 
-      /// 拖动取消
+      /// 双击清除
       onDoubleTap: _clearTip,
 
-      /// 双击清除
-      onTap: _showPenSettingDialog,
-
       /// 笔属性设置
-      onLongPressStart: _activeEdit,
+      // onTap: _showPenSettingDialog,
+
       // 长按开始，激活编辑线条
-      onLongPressMoveUpdate: _moveEdit,
+      onLongPressStart: _activeEdit,
+
       // 长按移动，移动线条
-      onLongPressUp: _cancelEdit,
+      onLongPressMoveUpdate: _moveEdit,
+
       // 长按抬起，取消编辑
+      onLongPressUp: _cancelEdit,
+
+      onForcePressUpdate: (details) {
+        _forcePress = details.pressure;
+      },
       child: CustomPaint(
         size: MediaQuery.of(context).size,
         painter: Painter(model: model),
@@ -114,7 +136,7 @@ class _WritingPageState extends State<WritingPage> {
 
   /// 拖动时收集点，将点加入doing状态Line中
   void _collectPoint(DragUpdateDetails details) {
-    model.pushPointItem(Point.fromOffset(details.localPosition));
+    model.pushPointItem(Point.fromOffset(details.localPosition, forcePress: _forcePress));
   }
 
   /// 结束，doing状态改为done,当前只有一个活动线条

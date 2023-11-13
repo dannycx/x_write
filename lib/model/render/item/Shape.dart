@@ -98,6 +98,14 @@ class Shape {
         _path.lineTo(left, top);
         canvas.drawPath(_path, paint);
         break;
+      case ShapeType.polygon: // 多边形
+        _path.reset();
+        _path.moveTo(left, top);
+        _path.lineTo(left, top + height);
+        _path.lineTo(left + width, top + height);
+        _path.lineTo(left, top);
+        canvas.drawPath(_path, paint);
+        break;
       case ShapeType.arrow: // 箭头
         double firstX = points[0].x;
         double firstY = points[0].y;

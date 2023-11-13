@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/Point.dart';
+import 'package:x_write/model/render/item/line_expand.dart';
 
 import '../data/paint_state.dart';
 
@@ -9,6 +10,7 @@ class Line {
   PaintState state;
   double strokeWidth;
   Color color;
+  AbsLineRender lineRender;
 
   // 记录该线进入编辑状态时的路径，通过record()赋值，translate()通过偏移量offset更新路径，实现移动效果
   Path? _recordPath;
@@ -16,7 +18,11 @@ class Line {
   // 绘制路径
   Path _linePath = Path();
 
-  Line({this.color = Colors.black, this.strokeWidth = 1, this.state = PaintState.doing});
+  Line(
+      {this.color = Colors.black,
+      this.strokeWidth = 1,
+      this.state = PaintState.doing,
+      this.lineRender = const Pen()});
 
   // 赋值_recordPath
   void record() {
@@ -50,14 +56,17 @@ class Line {
         ..color = Colors.deepOrangeAccent
         ..style = PaintingStyle.stroke;
 
-      canvas.drawRect(Rect.fromCenter(
-          center: _linePath.getBounds().center,
-          width: _linePath.getBounds().width + strokeWidth,
-          height: _linePath.getBounds().height + strokeWidth), editPaint);
+      canvas.drawRect(
+          Rect.fromCenter(
+              center: _linePath.getBounds().center,
+              width: _linePath.getBounds().width + strokeWidth,
+              height: _linePath.getBounds().height + strokeWidth),
+          editPaint);
     }
 
     /// 贝塞尔绘制
-    canvas.drawPath(_linePath, paint);
+    // canvas.drawPath(_linePath, paint);
+    lineRender.drawLine(canvas, paint, points);
 
     // 辅助线
     Path p1 = _linePath.shift(Offset(paint.strokeWidth / 2, paint.strokeWidth / 2));
@@ -97,47 +106,6 @@ class Line {
         /// 最后一个点处理
         // path.moveTo(current.x, current.y);
         // path.lineTo(next.x, next.y);
-      }
-    }
-
-    return path;
-  }
-
-  /// 三阶贝塞尔，绘制曲线
-  Path fromPath2() {
-    Path path = Path();
-
-    for (int i = 0; i < points.length - 1; i++) {
-      Point current = points[i];
-      Point next = points[i + 1];
-      if (i == 0) {
-        path.moveTo(current.x, current.y);
-
-        /// 控制点
-        double ctrlX = current.x + (next.x - current.x) / 2;
-        double ctrlY = next.y;
-        path.quadraticBezierTo(ctrlX, ctrlY, next.x, next.y);
-      } else if (i < points.length - 2) {
-        /// 控制点1
-        double ctrlX1 = current.x + (next.x - current.x) / 2;
-        double ctrlY1 = current.y;
-
-        /// 控制点2
-        double ctrlX2 = ctrlX1;
-        double ctrlY2 = next.y;
-
-        double xc = (current.x + next.x) / 2;
-        double yc = (current.y + next.y) / 2;
-        // Point p2 = points[i];
-        // path.quadraticBezierTo(p2.x, p2.y, xc, yc);
-        path.cubicTo(ctrlX1, ctrlY1, ctrlX2, ctrlY2, next.x, next.y);
-      } else {
-        path.moveTo(current.x, current.y);
-
-        /// 控制点
-        double ctrlX = current.x + (next.x - current.x) / 2;
-        double ctrlY = current.y;
-        path.quadraticBezierTo(ctrlX, ctrlY, next.x, next.y);
       }
     }
 

@@ -23,3 +23,11 @@ class ShapeTypeEvent {
 
   ShapeTypeEvent({required this.shapeType});
 }
+
+/// 图形类型事件
+class PenPropEvent {
+  Color color;
+  double thickness;
+
+  PenPropEvent({required this.color, this.thickness = 3.0});
+}

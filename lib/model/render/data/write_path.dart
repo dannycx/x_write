@@ -155,6 +155,9 @@ class ArrowPath extends AbsPath {
     tailMatrix4.multiply(Matrix4.translationValues(center.dx, center.dy, 0));
     tailMatrix4.multiply(Matrix4.rotationZ(line.direction - pi));
     tailMatrix4.multiply(Matrix4.translationValues(-center.dx, -center.dy, 0));
+
+    // 尾部箭头平移箭头大小一半，避免线条突出
+    tailMatrix4.multiply(Matrix4.translationValues(-head.size.width / 2, 0, 0));
     tailPath = tailPath.transform(tailMatrix4.storage);
 
     // PathOperation.union：路径并集

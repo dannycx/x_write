@@ -37,9 +37,11 @@ class _PenThicknessPageState extends State<PenThicknessPage> {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      height: 45,
-      child: Wrap(
-        spacing: 20,
+      height: 36,
+      child: Row(
+        // alignment: WrapAlignment.center,
+        // runAlignment: WrapAlignment.center,
+        // spacing: 8,
         children: widget.thicknessList.map((thickness) => GestureDetector(
           onTap: () => _doSelectThickness(thickness),
           child: _buildThicknessItem(thickness),
@@ -62,8 +64,9 @@ class _PenThicknessPageState extends State<PenThicknessPage> {
 
   // 构建颜色圆圈
   Widget _buildThicknessItem(double thickness) => Container(
-    width: thickness,
-    height: thickness,
+    margin: const EdgeInsets.only(right: 8),
+    width: thickness * 1.5,
+    height: thickness * 1.5,
     alignment: Alignment.center,
     decoration: const BoxDecoration(
         shape: BoxShape.circle,
@@ -74,8 +77,8 @@ class _PenThicknessPageState extends State<PenThicknessPage> {
 
   // 构建选中指示器
   Widget _buildActiveIndicator() => Container(
-    width: activeThickness * 0.6,
-    height: activeThickness * 0.6,
+    width: activeThickness * 1.5 * 0.7,
+    height: activeThickness * 1.5 * 0.7,
     decoration: const BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white

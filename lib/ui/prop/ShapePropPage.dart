@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/paint_state.dart';
+import 'package:x_write/tool/CustomIcon.dart';
 
 /// 回调
 typedef ShapePropCallback = void Function(ShapeType shapeType);
@@ -8,8 +9,7 @@ typedef ShapePropCallback = void Function(ShapeType shapeType);
 class ShapePropPage extends StatefulWidget {
   final ShapePropCallback? onToolShapeProp;
 
-  const ShapePropPage({Key? key, required this.onToolShapeProp})
-      : super(key: key);
+  const ShapePropPage({Key? key, required this.onToolShapeProp}) : super(key: key);
 
   @override
   State<ShapePropPage> createState() => _ShapePropPageState();
@@ -28,8 +28,7 @@ class _ShapePropPageState extends State<ShapePropPage> {
           // 圆角
           boxShadow: [
             // 阴影
-            BoxShadow(
-                color: Colors.grey, offset: Offset(1.0, 1.0), blurRadius: 0.5)
+            BoxShadow(color: Colors.grey, offset: Offset(1.0, 1.0), blurRadius: 0.5)
           ]),
       child: Row(
         children: <Widget>[
@@ -41,7 +40,8 @@ class _ShapePropPageState extends State<ShapePropPage> {
                 alignment: Alignment.center,
                 height: 36,
                 child: const Icon(
-                  Icons.circle_outlined,
+                  CustomIcon.tool_shape_circle,
+                  color: Colors.black,
                 ),
               )),
           const SizedBox(
@@ -55,7 +55,8 @@ class _ShapePropPageState extends State<ShapePropPage> {
                 alignment: Alignment.center,
                 height: 36,
                 child: const Icon(
-                  Icons.circle_outlined,
+                  CustomIcon.tool_shape_oval,
+                  color: Colors.black,
                 ),
               )),
           const SizedBox(
@@ -69,7 +70,8 @@ class _ShapePropPageState extends State<ShapePropPage> {
                 alignment: Alignment.center,
                 height: 36,
                 child: const Icon(
-                  Icons.square_outlined,
+                  CustomIcon.tool_shape_square,
+                  color: Colors.black,
                 ),
               )),
           const SizedBox(
@@ -83,7 +85,8 @@ class _ShapePropPageState extends State<ShapePropPage> {
                 alignment: Alignment.center,
                 height: 36,
                 child: const Icon(
-                  Icons.square_outlined,
+                  CustomIcon.tool_shape_regular_triangle,
+                  color: Colors.black,
                 ),
               )),
           const SizedBox(
@@ -97,7 +100,8 @@ class _ShapePropPageState extends State<ShapePropPage> {
                 alignment: Alignment.center,
                 height: 36,
                 child: const Icon(
-                  Icons.square_outlined,
+                  CustomIcon.tool_shape_right_triangle,
+                  color: Colors.black,
                 ),
               )),
           const SizedBox(
@@ -111,7 +115,8 @@ class _ShapePropPageState extends State<ShapePropPage> {
                 alignment: Alignment.center,
                 height: 36,
                 child: const Icon(
-                  Icons.star_outline,
+                  CustomIcon.tool_shape_star,
+                  color: Colors.black,
                 ),
               )),
           const SizedBox(
@@ -125,9 +130,25 @@ class _ShapePropPageState extends State<ShapePropPage> {
                 alignment: Alignment.center,
                 height: 36,
                 child: const Icon(
-                  Icons.arrow_right_alt_sharp,
+                  CustomIcon.tool_shape_polygon,
+                  color: Colors.black,
                 ),
-              )), const SizedBox(
+              )),
+          const SizedBox(
+            width: 8,
+          ), GestureDetector(
+              onTap: () {
+                widget.onToolShapeProp?.call(ShapeType.arrow);
+              },
+              child: Container(
+                alignment: Alignment.center,
+                height: 36,
+                child: const Icon(
+                  CustomIcon.tool_shape_arrow,
+                  color: Colors.black,
+                ),
+              )),
+          const SizedBox(
             width: 8,
           ),
           GestureDetector(
@@ -138,7 +159,8 @@ class _ShapePropPageState extends State<ShapePropPage> {
                 alignment: Alignment.center,
                 height: 36,
                 child: const Icon(
-                  Icons.arrow_right_alt_sharp,
+                  CustomIcon.tool_shape_line,
+                  color: Colors.black,
                 ),
               )),
         ],

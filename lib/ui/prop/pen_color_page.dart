@@ -14,7 +14,7 @@ class PenColorPage extends StatefulWidget {
   /// 默认颜色
   final Color? defColor;
 
-  const PenColorPage({required this.colors, this.radius = 25,
+  const PenColorPage({required this.colors, this.radius = 24,
     this.defColor = Colors.black, required this.onColorSelect});
 
   @override
@@ -37,9 +37,10 @@ class _PenColorPageState extends State<PenColorPage> {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      height: 45,
+      height: 36,
       child: Wrap( /// 流式布局
-        spacing: 20, /// 主轴方向widget间距
+        alignment: WrapAlignment.center,
+        spacing: 8, /// 主轴方向widget间距
         children: widget.colors.map((color) => GestureDetector(
           onTap: () => _doSelectColor(color),
           child: _buildColorItem(color),
@@ -74,8 +75,8 @@ class _PenColorPageState extends State<PenColorPage> {
 
   // 构建选中指示器
   Widget _buildActiveIndicator() => Container(
-    width: widget.radius * 0.6,
-    height: widget.radius * 0.6,
+    width: widget.radius * 0.7,
+    height: widget.radius * 0.7,
     decoration: const BoxDecoration(
       shape: BoxShape.circle,
       color: Colors.white

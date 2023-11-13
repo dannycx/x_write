@@ -20,11 +20,7 @@ class FunctionMenu extends StatelessWidget {
         decoration: const BoxDecoration(
             color: Colors.white,
             // 颜色
-            borderRadius: BorderRadiusDirectional.only(
-                topStart: Radius.circular(4),
-                topEnd: Radius.circular(4),
-                bottomStart: Radius.zero,
-                bottomEnd: Radius.zero),
+            borderRadius: BorderRadiusDirectional.all(Radius.circular(4)),
             // 圆角
             boxShadow: [
               // 阴影
@@ -34,21 +30,29 @@ class FunctionMenu extends StatelessWidget {
         child: Wrap(
           alignment: WrapAlignment.center,
           children: [
-            IconButton(
-                constraints: cts,
-                onPressed: onToolMenu,
-                icon: const Icon(
-                  CustomIcon.tool_menu,
-                  color: Colors.black,
+            GestureDetector(
+                onTap: onToolMenu,
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 36,
+                  child: const Icon(
+                    CustomIcon.tool_menu,
+                    color: Colors.black,
+                  ),
                 )),
-            // const SizedBox(
-            //   width: 16,
-            // ),
-            IconButton(
-                constraints: cts,
-                onPressed: onToolMenu,
-                icon: const Icon(CustomIcon.tool_decoration,
-                    color: Colors.black)),
+            const SizedBox(
+              width: 8,
+            ),
+            GestureDetector(
+                onTap: onToolMenu,
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 36,
+                  child: const Icon(
+                    CustomIcon.tool_decoration,
+                    color: Colors.black,
+                  ),
+                ))
           ],
         ));
   }

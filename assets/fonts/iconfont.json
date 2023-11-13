@@ -13,6 +13,13 @@
       "unicode_decimal": 59383
     },
     {
+      "icon_id": "996751",
+      "name": "箭头",
+      "font_class": "ai37",
+      "unicode": "e69a",
+      "unicode_decimal": 59034
+    },
+    {
       "icon_id": "1459175",
       "name": "多媒体",
       "font_class": "duomeit",
@@ -20,11 +27,32 @@
       "unicode_decimal": 58913
     },
     {
-      "icon_id": "3822751",
-      "name": "02-钢笔",
-      "font_class": "-gangbi",
-      "unicode": "e620",
-      "unicode_decimal": 58912
+      "icon_id": "2681717",
+      "name": "五角星",
+      "font_class": "wujiaoxing",
+      "unicode": "e614",
+      "unicode_decimal": 58900
+    },
+    {
+      "icon_id": "4354255",
+      "name": "形状-椭圆形",
+      "font_class": "xingzhuang-tuoyuanxing",
+      "unicode": "eb99",
+      "unicode_decimal": 60313
+    },
+    {
+      "icon_id": "5194489",
+      "name": "荧光笔，笔，粗笔，画重点，划重点",
+      "font_class": "wenjuicon",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "5194490",
+      "name": "钢笔，笔",
+      "font_class": "wenjuicon1",
+      "unicode": "e602",
+      "unicode_decimal": 58882
     },
     {
       "icon_id": "5648855",
@@ -41,6 +69,13 @@
       "unicode_decimal": 60541
     },
     {
+      "icon_id": "6266249",
+      "name": "椭圆形",
+      "font_class": "tuoyuanxing",
+      "unicode": "e790",
+      "unicode_decimal": 59280
+    },
+    {
       "icon_id": "7459720",
       "name": "毛笔",
       "font_class": "weibiaoti-_huabanfuben",
@@ -51,8 +86,8 @@
       "icon_id": "7789610",
       "name": "文本",
       "font_class": "wenben",
-      "unicode": "e602",
-      "unicode_decimal": 58882
+      "unicode": "e603",
+      "unicode_decimal": 58883
     },
     {
       "icon_id": "8288841",
@@ -74,13 +109,6 @@
       "font_class": "biaoge",
       "unicode": "e615",
       "unicode_decimal": 58901
-    },
-    {
-      "icon_id": "12369887",
-      "name": "highlighter",
-      "font_class": "highlighter",
-      "unicode": "ede8",
-      "unicode_decimal": 60904
     },
     {
       "icon_id": "12635082",
@@ -111,11 +139,25 @@
       "unicode_decimal": 58949
     },
     {
+      "icon_id": "14421475",
+      "name": "图形-直线",
+      "font_class": "zhixian_huaban1",
+      "unicode": "e66d",
+      "unicode_decimal": 58989
+    },
+    {
       "icon_id": "15053872",
       "name": "ai",
       "font_class": "24px2x",
       "unicode": "e607",
       "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "15726968",
+      "name": "形状-三角形",
+      "font_class": "xingzhuang-sanjiaoxing",
+      "unicode": "e652",
+      "unicode_decimal": 58962
     },
     {
       "icon_id": "15937155",
@@ -125,11 +167,53 @@
       "unicode_decimal": 59377
     },
     {
+      "icon_id": "17521051",
+      "name": "矩形",
+      "font_class": "juxing",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "17581796",
+      "name": "长方体",
+      "font_class": "changfangti",
+      "unicode": "ec70",
+      "unicode_decimal": 60528
+    },
+    {
+      "icon_id": "17581801",
+      "name": "圆锥体",
+      "font_class": "yuanzhuiti",
+      "unicode": "ec71",
+      "unicode_decimal": 60529
+    },
+    {
+      "icon_id": "17581803",
+      "name": "球体",
+      "font_class": "qiuti",
+      "unicode": "ec72",
+      "unicode_decimal": 60530
+    },
+    {
+      "icon_id": "17581806",
+      "name": "圆柱体",
+      "font_class": "yuanzhuti",
+      "unicode": "ec73",
+      "unicode_decimal": 60531
+    },
+    {
       "icon_id": "17930630",
       "name": "圈选",
       "font_class": "quanxuan",
       "unicode": "e605",
       "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "22942779",
+      "name": "simianti",
+      "font_class": "simianti",
+      "unicode": "e6cf",
+      "unicode_decimal": 59087
     },
     {
       "icon_id": "22965493",
@@ -144,6 +228,20 @@
       "font_class": "bi",
       "unicode": "e7c5",
       "unicode_decimal": 59333
+    },
+    {
+      "icon_id": "26060539",
+      "name": "多边形",
+      "font_class": "polygon",
+      "unicode": "e6af",
+      "unicode_decimal": 59055
+    },
+    {
+      "icon_id": "29595415",
+      "name": "素材栏-左下直角三角形",
+      "font_class": "sucailan-zuoxiazhijiaosanjiaoxing",
+      "unicode": "e735",
+      "unicode_decimal": 59189
     },
     {
       "icon_id": "36276840",
