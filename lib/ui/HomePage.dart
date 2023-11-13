@@ -166,7 +166,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _penPropPageVisible = true;
     });
-    eventBus.fire(OpTypeEvent(opType: OpType.pen));
+    eventBus.fire(OpTypeEvent(opType: OpType.pencil));
   }
 
   void _onToolAi() {

@@ -22,10 +22,11 @@ class Point {
 
   Offset toOffset() => Offset(x, y);
 
-  void setPoint(Point point) {
+  Point setPoint(Point point) {
     x = point.x;
     y = point.y;
     press = point.press;
+    return this;
   }
 
   void setPointXY(double dx, double dy, double dPress) {

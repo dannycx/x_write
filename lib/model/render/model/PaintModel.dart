@@ -18,12 +18,6 @@ class PaintModel extends ChangeNotifier {
 
   PaintModel({this.opType = OpType.pen, this.shapeType = ShapeType.circle});
 
-  // 笔锋处理
-  Point lastPoint = Point(x: 0, y: 0);
-  Point curPoint = Point(x: 0, y: 0);
-  double lastVel = 0.0;
-  double lastWidth = 0.0;
-
   /// 线集
   final List<Line?> _lines = [];
 
@@ -57,29 +51,29 @@ class PaintModel extends ChangeNotifier {
         // 钢笔画线
         Line line = Line(color: color, strokeWidth: strokeWidth, lineRender: const Pen());
         _lines.add(line);
-        lastPoint = Point.fromOffset(details.localPosition);
-        pushPointSteelLine(lastPoint);
+        Point point = Point.fromOffset(details.localPosition);
+        pushPointLine(point);
         break;
       case OpType.highlight:
         // 荧光笔画线
         Line line = Line(color: color, strokeWidth: strokeWidth, lineRender: const Highlight());
         _lines.add(line);
-        lastPoint = Point.fromOffset(details.localPosition);
-        pushPointLine(lastPoint);
+        Point point = Point.fromOffset(details.localPosition);
+        pushPointLine(point);
         break;
       case OpType.pencil:
         // 铅笔画线
         Line line = Line(color: color, strokeWidth: strokeWidth, lineRender: const Pencil());
         _lines.add(line);
-        lastPoint = Point.fromOffset(details.localPosition);
-        pushPointLine(lastPoint);
+        Point point = Point.fromOffset(details.localPosition);
+        pushPointLine(point);
         break;
       case OpType.brush:
         // 毛笔画线
         Line line = Line(color: color, strokeWidth: strokeWidth, lineRender: const Brush());
         _lines.add(line);
-        lastPoint = Point.fromOffset(details.localPosition);
-        pushPointLine(lastPoint);
+        Point point = Point.fromOffset(details.localPosition);
+        pushPointLine(point);
         break;
       case OpType.shape:
         // 收集形状
@@ -95,6 +89,8 @@ class PaintModel extends ChangeNotifier {
   void pushPointItem(Point point, {bool force = false}) {
     switch (opType) {
       case OpType.pen:
+        pushPointLine(point, force: true);
+        break;
       case OpType.highlight:
       case OpType.pencil:
       case OpType.brush:
@@ -215,51 +211,6 @@ class PaintModel extends ChangeNotifier {
 
     /// 通知画板重绘，避免setState对组件重构
     notifyListeners();
-  }
-
-  /// 移动中收集 Point 放入activeLine，force控制是否过滤点，默认过滤，避免点密集绘制线条不圆滑
-  /// 硬笔轨迹
-  void pushPointSteelLine(Point point, {bool force = false}) {
-    if (activeLine == null) return;
-
-    if (activeLine!.points.isNotEmpty && !force) {
-      if ((point - activeLine!.points.last).distance < tolerance) return;
-    }
-
-    curPoint = point;
-    double deltaX = curPoint.x - lastPoint.x;
-    double deltaY = curPoint.y - lastPoint.y;
-
-    // deltaX 和 deltaY平方和的二次方根 想象一个例子 1+1的平方根为1.4 （x²+y²）开根号
-    // 同理，当滑动的越快的话，deltaX + deltaY的值越大，这个越大的话，curDis也越大
-    double curDis = sqrt(deltaX * deltaX + deltaY * deltaY);
-
-    // 我们求出的这个值越小，画的点或者是绘制椭圆形越多，这个值越大的话，绘制的越少，笔就越细，宽度越小
-    double curVel = curDis * DIS_VEL_CAL_FACTOR;
-    final double curWidth;
-
-    if (activeLine!.points.length < 2) {
-      curWidth = _calcNewWidth(curVel, lastVel, curDis, 1.7, lastWidth);
-      point.press = curWidth;
-    } else {
-      lastVel = curVel;
-      curWidth = _calcNewWidth(curVel, lastVel, curDis, 1.7, lastWidth);
-      point.press = curWidth;
-    }
-    activeLine!.points.add(point);
-
-    lastWidth = curWidth;
-    lastPoint = curPoint;
-
-    /// 通知画板重绘，避免setState对组件重构
-    notifyListeners();
-  }
-
-  /// 计算新的宽度信息
-  double _calcNewWidth(double curVel, double lastVel, double curDis, double factor, double lastWidth) {
-    double calVel = curVel * 0.6 + lastVel * (1 - 0.6);
-    double vfac = log(factor * 2.0) * -calVel;
-    return activeLine!.strokeWidth * exp(vfac);
   }
 
   /// 通过路径矩形区域判断是否需要把线置为edit状态，重叠取第一个

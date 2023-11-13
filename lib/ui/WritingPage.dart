@@ -20,7 +20,7 @@ class _WritingPageState extends State<WritingPage> {
   final PaintModel model = PaintModel();
 
   /// 操作类型
-  OpType opType = OpType.pen;
+  OpType opType = OpType.pencil;
 
   /// 图形类型
   ShapeType shapeType = ShapeType.circle;
@@ -136,7 +136,7 @@ class _WritingPageState extends State<WritingPage> {
 
   /// 拖动时收集点，将点加入doing状态Line中
   void _collectPoint(DragUpdateDetails details) {
-    model.pushPointItem(Point.fromOffset(details.localPosition, forcePress: _forcePress));
+    model.pushPointItem(Point.fromOffset(details.localPosition/*, forcePress: _forcePress*/));
   }
 
   /// 结束，doing状态改为done,当前只有一个活动线条

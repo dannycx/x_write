@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/Point.dart';
 
@@ -27,6 +29,92 @@ class Pen extends AbsLineRender {
   void drawLine(Canvas canvas, Paint paint, List<Point> points) {
     Path path = fromPath(points);
     canvas.drawPath(path, paint);
+    // points = _handlePoint(points);
+    // Point curPoint = points[0];
+    // for (int index = 1; index < points.length; index++) {
+    //   Point point = points[index];
+    //   drawLine2(canvas, curPoint.x, curPoint.y, curPoint.press, point.x,
+    //       point.y, point.press, paint);
+    //   curPoint = point;
+    // }
+  }
+
+  /// 绘制方法，实现笔锋效果
+  void drawLine2(Canvas canvas, double x0, double y0, double w0, double x1,
+      double y1, double w1, Paint paint) {
+    // 求两个数字的平方根 x的平方+y的平方在开方记得X的平方+y的平方=1，这就是一个园
+    double curDis = sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
+
+    // 绘制的笔的宽度是多少，绘制多少个椭圆
+    final int steps;
+    if (paint.strokeWidth < 6) {
+      steps = (1 + curDis / 2) as int;
+    } else if (paint.strokeWidth > 60) {
+      steps = (1 + (curDis / 4)) as int;
+    } else {
+      steps = (1 + (curDis / 3)) as int;
+    }
+    double deltaX = (x1 - x0) / steps;
+    double deltaY = (y1 - y0) / steps;
+    double deltaW = (w1 - w0) / steps;
+    double x = x0;
+    double y = y0;
+    double w = w0;
+    int index = 0;
+    while (index < steps) {
+      double top = (y - w / 2.0);
+      double left = (x - w / 4.0);
+      double right = (x + w / 4.0);
+      double bottom = (y + w / 2.0);
+      Rect oval = Rect.fromLTRB(left, top, right, bottom);
+      canvas.drawOval(oval, paint);
+      x += deltaX;
+      y += deltaY;
+      w += deltaW;
+      index++;
+    }
+  }
+
+  List<Point> _handlePoint(List<Point> points) {
+    List<Point> pointList = [];
+    Point lastPoint = points[0];
+    double lastVel = 0.0;
+    double lastWidth = 3 * 0.7;
+    for (int index = 1; index < points.length; index++) {
+      Point curPoint = points[index];
+      double deltaX = (curPoint.x - lastPoint.x);
+      double deltaY = (curPoint.y - lastPoint.y);
+
+      // deltaX 和 deltaY平方和的二次方根 想象一个例子 1+1的平方根为1.4 （x²+y²）开根号
+      // 同理，当滑动的越快的话，deltaX + deltaY的值越大，这个越大的话，curDis也越大
+      double curDis = sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      // 我们求出的这个值越小，画的点或者是绘制椭圆形越多，这个值越大的话，绘制的越少，笔就越细，宽度越小
+      double curVel = curDis * DIS_VEL_CAL_FACTOR;
+      double curWidth;
+      if (index < 2) {
+        curWidth = _calcNewWidth(curVel, lastVel, curDis, 1.7, lastWidth);
+        curPoint.press = curWidth;
+        pointList.add(curPoint);
+      } else {
+        lastVel = curVel;
+        curWidth = _calcNewWidth(curVel, lastVel, curDis, 1.7, lastWidth);
+        curPoint.press = curWidth;
+        pointList.add(curPoint);
+      }
+      lastPoint = curPoint;
+      lastWidth = curWidth;
+    }
+
+    return pointList;
+  }
+
+  /// 计算新的宽度信息
+  double _calcNewWidth(double curVel, double lastVel, double curDis,
+      double factor, double lastWidth) {
+    double calVel = curVel * 0.6 + lastVel * (1 - 0.6);
+    double vfac = log(factor * 2.0) * -calVel;
+    return 3 * exp(vfac);
   }
 }
 
@@ -127,18 +215,19 @@ Path fromPath2(List<Point> points) {
   return path;
 }
 
+/// 贝塞尔操作工具类，对点的位置和宽度控制的bezier曲线，主要是两个点，都包含了宽度和点的坐标
 class Bezier {
   // 控制点
-  final controlPoint = Point(x: 0, y: 0);
+  final controlPoint = Point();
 
   // 距离
-  final destinationPoint = Point(x: 0, y: 0);
+  final destinationPoint = Point();
 
   // 下一个控制点
-  final nextPoint = Point(x: 0, y: 0);
+  final nextPoint = Point();
 
   // 资源的点
-  final source = Point(x: 0, y: 0);
+  final source = Point();
 
   /// 初始化两个点，
   ///
@@ -148,7 +237,8 @@ class Bezier {
     _init(last.x, last.y, last.press, cur.x, cur.y, cur.press);
   }
 
-  void _init(double lastX, double lastY, double lastWidth, double x, double y, double width) {
+  void _init(double lastX, double lastY, double lastWidth, double x, double y,
+      double width) {
     // 资源点设置，最后的点的为资源点
     source.setPointXY(lastX, lastY, lastWidth);
     double xMid = getMid(lastX, x);
@@ -159,7 +249,8 @@ class Bezier {
     destinationPoint.setPointXY(xMid, yMid, wMid);
 
     // 控制点为当前的距离点
-    controlPoint.setPointXY(getMid(lastX, xMid), getMid(lastY, yMid), getMid(lastWidth, wMid));
+    controlPoint.setPointXY(
+        getMid(lastX, xMid), getMid(lastY, yMid), getMid(lastWidth, wMid));
 
     // 下个控制点为当前点
     nextPoint.setPointXY(x, y, width);
@@ -178,7 +269,8 @@ class Bezier {
   void _addNode(double x, double y, double width) {
     source.setPoint(destinationPoint);
     controlPoint.setPoint(nextPoint);
-    destinationPoint.setPointXY(getMid(nextPoint.x, x), getMid(nextPoint.y, y), getMid(nextPoint.press, width));
+    destinationPoint.setPointXY(getMid(nextPoint.x, x), getMid(nextPoint.y, y),
+        getMid(nextPoint.press, width));
     nextPoint.setPointXY(x, y, width);
   }
 
@@ -211,11 +303,11 @@ class Bezier {
   }
 
   double getX(double t) {
-    return getValue(source.x.toDouble(), controlPoint.x.toDouble(), destinationPoint.x.toDouble(), t);
+    return getValue(source.x, controlPoint.x, destinationPoint.x, t);
   }
 
   double getY(double t) {
-    return getValue(source.y.toDouble(), controlPoint.y.toDouble(), destinationPoint.y.toDouble(), t);
+    return getValue(source.y, controlPoint.y, destinationPoint.y, t);
   }
 
   double getW(double t) {
@@ -236,3 +328,6 @@ class Bezier {
 
 /// 笔锋控制值,越小笔锋越粗,越不明显
 const double DIS_VEL_CAL_FACTOR = 0.008;
+
+/// 绘制计算的次数，数值越小计算的次数越多
+const int STEP_FACTOR = 20;

@@ -22,7 +22,7 @@ class Line {
       {this.color = Colors.black,
       this.strokeWidth = 1,
       this.state = PaintState.doing,
-      this.lineRender = const Pen()});
+      this.lineRender = const Pencil()});
 
   // 赋值_recordPath
   void record() {
