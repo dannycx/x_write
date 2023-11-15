@@ -34,4 +34,7 @@ class Point {
     y = dy;
     press = dPress;
   }
+
+  /// 是否位于当前点上面
+  bool isUp(Point other) => other.y < y;
 }

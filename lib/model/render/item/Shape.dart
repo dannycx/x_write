@@ -64,6 +64,19 @@ class Shape {
     double left = _shapeRect?.left ?? 0;
     double top = _shapeRect?.top ?? 0;
     double radius = width / 2;
+
+    // 首尾点
+    Point firstPoint = points[0];
+    Point lastPoint = points[points.length - 1];
+    double fixedX = firstPoint.x;
+    double fixedY = firstPoint.y;
+    double lastX = lastPoint.x;
+    double lastY = lastPoint.y;
+
+    // x,y间距
+    double spaceX = lastX - fixedX;
+    double spaceY = lastY - fixedY;
+
     switch (shapeType) {
       case ShapeType.circle: // 圆
         canvas.drawCircle(Offset(left + radius, top + radius), radius, paint);
@@ -76,34 +89,40 @@ class Shape {
         break;
       case ShapeType.regularTriangle: // 等腰三角
         _path.reset();
-        _path.moveTo(left + radius, top);
-        _path.lineTo(left, top + height);
-        _path.lineTo(left + width, top + height);
-        _path.lineTo(left + radius, top);
+        TrianglePath trianglePath = TrianglePath(
+            fixedPoint: Offset(fixedX + spaceX / 2, fixedY),
+            leftPoint: Offset(fixedX, lastY),
+            rightPoint: Offset(lastX, lastY));
+        _path.addPath(trianglePath.fromPath(), Offset.zero);
         canvas.drawPath(_path, paint);
         break;
       case ShapeType.rightTriangle: // 直角三角
         _path.reset();
-        _path.moveTo(left, top);
-        _path.lineTo(left, top + height);
-        _path.lineTo(left + width, top + height);
-        _path.lineTo(left, top);
-        canvas.drawPath(_path, paint);
+        TrianglePath trianglePath = TrianglePath(
+            fixedPoint: Offset(fixedX, fixedY),
+            leftPoint: Offset(fixedX, lastY),
+            rightPoint: Offset(lastX, lastY));
+        _path.addPath(trianglePath.fromPath(), Offset.zero);
+        canvas.drawPath(trianglePath.fromPath(), paint);
         break;
       case ShapeType.star: // 五角星
         _path.reset();
-        _path.moveTo(left, top);
-        _path.lineTo(left, top + height);
-        _path.lineTo(left + width, top + height);
-        _path.lineTo(left, top);
+        // _path.moveTo(left, top);
+        // _path.lineTo(left, top + height);
+        // _path.lineTo(left + width, top + height);
+        // _path.lineTo(left, top);
+        StarPath starPath =
+            StarPath(first: Offset(fixedX, fixedY), size: Size(width, height));
+        _path.addPath(starPath.fromPath(), Offset.zero);
         canvas.drawPath(_path, paint);
         break;
       case ShapeType.polygon: // 多边形
         _path.reset();
-        _path.moveTo(left, top);
-        _path.lineTo(left, top + height);
-        _path.lineTo(left + width, top + height);
-        _path.lineTo(left, top);
+        PolygonPath polygonPath = PolygonPath(
+            first: Offset(fixedX, fixedY),
+            size: Size(spaceX, spaceY),
+            factor: 3);
+        _path.addPath(polygonPath.fromPath(), Offset.zero);
         canvas.drawPath(_path, paint);
         break;
       case ShapeType.arrow: // 箭头

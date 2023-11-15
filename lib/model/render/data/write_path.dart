@@ -62,6 +62,7 @@ class TrianglePortPath extends AbsPortPathBuilder {
 /// 三个箭头
 class ThreeAnglePortPath extends AbsPortPathBuilder {
   final double rate;
+
   const ThreeAnglePortPath({this.rate = 0.8});
 
   @override
@@ -163,5 +164,113 @@ class ArrowPath extends AbsPath {
     // PathOperation.union：路径并集
     Path temp = Path.combine(PathOperation.union, linePath, headPath);
     return Path.combine(PathOperation.union, temp, tailPath);
+  }
+}
+
+/// 三角形
+class TrianglePath extends AbsPath {
+  Offset fixedPoint;
+  Offset leftPoint;
+  Offset rightPoint;
+
+  TrianglePath(
+      {required this.fixedPoint,
+      required this.leftPoint,
+      required this.rightPoint});
+
+  @override
+  Path fromPath() => Path()
+    ..moveTo(fixedPoint.dx, fixedPoint.dy)
+    ..lineTo(leftPoint.dx, leftPoint.dy)
+    ..lineTo(rightPoint.dx, rightPoint.dy)
+    ..close();
+}
+
+/// 多边形Polygon：平行四边形(1)，菱形(2)，六边形(3)
+class PolygonPath extends AbsPath {
+  Offset first;
+  Size size;
+  int factor;
+
+  PolygonPath({required this.first, required this.size, this.factor = 2});
+
+  @override
+  Path fromPath() {
+    switch (factor) {
+      case 1:
+        return _parallelogram();
+      case 2:
+        return _diamond();
+      default:
+        return _hexagon();
+    }
+  }
+
+  // 平行四边形
+  Path _parallelogram() => Path()
+    ..moveTo(first.dx, first.dy)
+    ..lineTo(first.dx + size.width / 2, first.dy)
+    ..lineTo(first.dx + size.width, first.dy + size.height)
+    ..lineTo(first.dx + size.width / 2, first.dy + size.height)
+    ..close();
+
+  // 菱形
+  Path _diamond() => Path()
+    ..moveTo(first.dx + size.width / 2, first.dy)
+    ..lineTo(first.dx + size.width, first.dy + size.height / 2)
+    ..lineTo(first.dx + size.width / 2, first.dy + size.height)
+    ..lineTo(first.dx, first.dy + size.height / 2)
+    ..close();
+
+  // 六边形
+  Path _hexagon() => Path()
+    ..moveTo(first.dx + size.width / 3, first.dy)
+    ..lineTo(first.dx + size.width / 3 * 2, first.dy)
+    ..lineTo(first.dx + size.width, first.dy + size.height / 3)
+    ..lineTo(first.dx + size.width, first.dy + size.height / 3 * 2)
+    ..lineTo(first.dx + size.width / 3 * 2, first.dy + size.height)
+    ..lineTo(first.dx + size.width / 3, first.dy + size.height)
+    ..lineTo(first.dx, first.dy + size.height / 3 * 2)
+    ..lineTo(first.dx, first.dy + size.height / 3)
+    ..close();
+}
+
+/// 五角星
+class StarPath extends AbsPath {
+  Offset first;
+  Size size;
+  int count;
+
+  StarPath({required this.first, required this.size, this.count = 5});
+
+  double _degreeToRadius(double degree) => degree * (pi / 180.0);
+
+  @override
+  Path fromPath() {
+    Path path = Path();
+
+    double max = 2 * pi;
+
+    double width = size.width;
+    // double halfWidth = first.dx + width / 2;
+    double halfWidth = width / 2;
+
+    double wingRadius = halfWidth;
+    double radius = halfWidth / 2;
+
+    double degreePreStep = _degreeToRadius(360 / count);
+    double halfDegreePreStep = degreePreStep / 2;
+
+    path.moveTo(width, halfWidth);
+
+    for (double step = 0; step < max; step += degreePreStep) {
+      path.lineTo(halfWidth + wingRadius * cos(step),
+          halfWidth + wingRadius * sin(step));
+      path.lineTo(halfWidth + radius * cos(step + halfDegreePreStep),
+          halfWidth + radius * sin(step + halfDegreePreStep));
+    }
+
+    path.close();
+    return path;
   }
 }

@@ -124,7 +124,7 @@ class _ShapePropPageState extends State<ShapePropPage> {
           ),
           GestureDetector(
               onTap: () {
-                widget.onToolShapeProp?.call(ShapeType.arrow);
+                widget.onToolShapeProp?.call(ShapeType.polygon);
               },
               child: Container(
                 alignment: Alignment.center,

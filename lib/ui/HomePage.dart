@@ -25,6 +25,16 @@ class _HomePageState extends State<HomePage> {
   bool _shapePropPageVisible = false;
 
   @override
+  void initState() {
+    // 横屏
+    // SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+
+    // 全屏显示
+    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Overlay.of(context).insert(_enetry());
