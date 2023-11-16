@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/Point.dart';
+import 'package:x_write/model/render/data/dash_painter.dart';
 import 'package:x_write/model/render/data/write_path.dart';
 
 import '../data/paint_state.dart';
@@ -19,8 +20,7 @@ class Shape {
   Rect? _recordRect;
 
   // 绘制路径
-  Rect? _shapeRect =
-      Rect.fromCenter(center: const Offset(0, 0), width: 0, height: 0);
+  Rect? _shapeRect = Rect.fromCenter(center: const Offset(0, 0), width: 0, height: 0);
 
   // 绘制路径
   final Path _path = Path();
@@ -85,7 +85,13 @@ class Shape {
         canvas.drawOval(_shapeRect!, paint);
         break;
       case ShapeType.square: // 矩形
-        canvas.drawRect(_shapeRect!, paint);
+        _path.reset();
+        _path.addRRect(RRect.fromRectAndRadius(
+            Rect.fromCircle(
+                center: Offset(fixedX + spaceX / 2, fixedY + spaceY / 2), radius: min(spaceX.abs(), spaceY.abs()) / 2),
+            const Radius.circular(10)));
+        DashPainter dashPainter = DashPainter(step: 10, span: 0);
+        dashPainter.paint(canvas, paint, _path);
         break;
       case ShapeType.regularTriangle: // 等腰三角
         _path.reset();
@@ -99,60 +105,37 @@ class Shape {
       case ShapeType.rightTriangle: // 直角三角
         _path.reset();
         TrianglePath trianglePath = TrianglePath(
-            fixedPoint: Offset(fixedX, fixedY),
-            leftPoint: Offset(fixedX, lastY),
-            rightPoint: Offset(lastX, lastY));
+            fixedPoint: Offset(fixedX, fixedY), leftPoint: Offset(fixedX, lastY), rightPoint: Offset(lastX, lastY));
         _path.addPath(trianglePath.fromPath(), Offset.zero);
         canvas.drawPath(trianglePath.fromPath(), paint);
         break;
       case ShapeType.star: // 五角星
         _path.reset();
-        // _path.moveTo(left, top);
-        // _path.lineTo(left, top + height);
-        // _path.lineTo(left + width, top + height);
-        // _path.lineTo(left, top);
-        StarPath starPath =
-            StarPath(first: Offset(fixedX, fixedY), size: Size(width, height));
+        StarPath starPath = StarPath(first: Offset(fixedX, fixedY), size: Size(width, height));
         _path.addPath(starPath.fromPath(), Offset.zero);
         canvas.drawPath(_path, paint);
         break;
       case ShapeType.polygon: // 多边形
         _path.reset();
-        PolygonPath polygonPath = PolygonPath(
-            first: Offset(fixedX, fixedY),
-            size: Size(spaceX, spaceY),
-            factor: 3);
+        PolygonPath polygonPath = PolygonPath(first: Offset(fixedX, fixedY), size: Size(spaceX, spaceY), factor: 3);
         _path.addPath(polygonPath.fromPath(), Offset.zero);
         canvas.drawPath(_path, paint);
         break;
       case ShapeType.arrow: // 箭头
-        double firstX = points[0].x;
-        double firstY = points[0].y;
-        double lastX = points[points.length - 1].x;
-        double lastY = points[points.length - 1].y;
         Size portSize = const Size(10, 10);
         ArrowPath arrowPath = ArrowPath(
-            head: PortPath(
-                center: Offset(firstX, firstY),
-                size: portSize,
-                portPath: const NullPortPath()),
-            tail: PortPath(
-                center: Offset(lastX, lastY),
-                size: portSize,
-                portPath: const ThreeAnglePortPath()));
+            head: PortPath(center: Offset(fixedX, fixedY), size: portSize, portPath: const NullPortPath()),
+            tail: PortPath(center: Offset(lastX, lastY), size: portSize, portPath: const ThreeAnglePortPath()));
 
         paint.style = PaintingStyle.fill;
         canvas.drawPath(arrowPath.fromPath(), paint);
         break;
       case ShapeType.line: // 线
         _path.reset();
-        double firstX = points[0].x;
-        double firstY = points[0].y;
-        double lastX = points[points.length - 1].x;
-        double lastY = points[points.length - 1].y;
-        _path.moveTo(firstX, firstY);
+        _path.moveTo(fixedX, fixedY);
         _path.lineTo(lastX, lastY);
-        canvas.drawPath(_path, paint);
+        DashPainter dashPainter = const DashPainter(step: 10, span: 2, pointCount: 3, pointLength: 1);
+        dashPainter.paint(canvas, paint, _path);
         break;
       default:
         break;
@@ -194,8 +177,7 @@ class Shape {
     double lastX = points[points.length - 1].x;
     double lastY = points[points.length - 1].y;
 
-    return Rect.fromLTRB(min(firstX, lastX), min(firstY, lastY),
-        max(firstX, lastX), max(firstY, lastY));
+    return Rect.fromLTRB(min(firstX, lastX), min(firstY, lastY), max(firstX, lastX), max(firstY, lastY));
   }
 
   /// 最大最小点图形绘制区域
@@ -228,9 +210,6 @@ class Shape {
     double height = bottom - top;
     double radiusX = width / 2;
     double radiusY = height / 2;
-    return Rect.fromCenter(
-        center: Offset(left + radiusX, top + radiusY),
-        width: width,
-        height: height);
+    return Rect.fromCenter(center: Offset(left + radiusX, top + radiusY), width: width, height: height);
   }
 }
