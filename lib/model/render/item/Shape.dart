@@ -46,24 +46,13 @@ class Shape {
 
   /// 渲染
   void render(Canvas canvas, Paint paint) {
+    if (points.isEmpty) return;
     paint
       ..style = paintingStyle
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..strokeWidth = strokeWidth
       ..color = color;
-
-    if (state == PaintState.doing) {
-      _shapeRect = fromRect();
-    }
-
-    double width = _shapeRect?.width ?? 0;
-    double height = _shapeRect?.height ?? 0;
-    if (width == 0 || height == 0) return;
-
-    double left = _shapeRect?.left ?? 0;
-    double top = _shapeRect?.top ?? 0;
-    double radius = width / 2;
 
     // 首尾点
     Point firstPoint = points[0];
@@ -77,37 +66,28 @@ class Shape {
     double spaceX = lastX - fixedX;
     double spaceY = lastY - fixedY;
 
+    if (state == PaintState.doing) {
+      _shapeRect = fromRect();
+      _path.reset();
+      ShapeFromCircular shapeFromCircular = ShapeFromCircular(shapeType: shapeType, first: firstPoint, last: lastPoint);
+      _path.addPath(shapeFromCircular.fromPath(), Offset.zero);
+    }
+
+    double width = _shapeRect?.width ?? 0;
+    double height = _shapeRect?.height ?? 0;
+    if (width == 0 || height == 0) return;
+
+    double left = _shapeRect?.left ?? 0;
+    double top = _shapeRect?.top ?? 0;
+    double radius = width / 2;
+
     switch (shapeType) {
       case ShapeType.circle: // 圆
-        canvas.drawCircle(Offset(left + radius, top + radius), radius, paint);
-        break;
       case ShapeType.oval: // 椭圆
-        canvas.drawOval(_shapeRect!, paint);
-        break;
       case ShapeType.square: // 矩形
-        _path.reset();
-        _path.addRRect(RRect.fromRectAndRadius(
-            Rect.fromCircle(
-                center: Offset(fixedX + spaceX / 2, fixedY + spaceY / 2), radius: min(spaceX.abs(), spaceY.abs()) / 2),
-            const Radius.circular(10)));
-        DashPainter dashPainter = DashPainter(step: 10, span: 0);
-        dashPainter.paint(canvas, paint, _path);
-        break;
       case ShapeType.regularTriangle: // 等腰三角
-        _path.reset();
-        TrianglePath trianglePath = TrianglePath(
-            fixedPoint: Offset(fixedX + spaceX / 2, fixedY),
-            leftPoint: Offset(fixedX, lastY),
-            rightPoint: Offset(lastX, lastY));
-        _path.addPath(trianglePath.fromPath(), Offset.zero);
-        canvas.drawPath(_path, paint);
-        break;
       case ShapeType.rightTriangle: // 直角三角
-        _path.reset();
-        TrianglePath trianglePath = TrianglePath(
-            fixedPoint: Offset(fixedX, fixedY), leftPoint: Offset(fixedX, lastY), rightPoint: Offset(lastX, lastY));
-        _path.addPath(trianglePath.fromPath(), Offset.zero);
-        canvas.drawPath(trianglePath.fromPath(), paint);
+        canvas.drawPath(_path, paint);
         break;
       case ShapeType.star: // 五角星
         _path.reset();
@@ -116,24 +96,19 @@ class Shape {
         canvas.drawPath(_path, paint);
         break;
       case ShapeType.polygon: // 多边形
-        _path.reset();
-        PolygonPath polygonPath = PolygonPath(first: Offset(fixedX, fixedY), size: Size(spaceX, spaceY), factor: 3);
-        _path.addPath(polygonPath.fromPath(), Offset.zero);
+        // _path.reset();
+        // PolygonPath polygonPath = PolygonPath(first: Offset(fixedX, fixedY), size: Size(spaceX, spaceY), factor: 3);
+        // _path.addPath(polygonPath.fromPath(), Offset.zero);
+        canvas.save();
+        canvas.translate(fixedX + spaceX / 2, fixedY + spaceY / 2);
         canvas.drawPath(_path, paint);
+        canvas.restore();
         break;
       case ShapeType.arrow: // 箭头
-        Size portSize = const Size(10, 10);
-        ArrowPath arrowPath = ArrowPath(
-            head: PortPath(center: Offset(fixedX, fixedY), size: portSize, portPath: const NullPortPath()),
-            tail: PortPath(center: Offset(lastX, lastY), size: portSize, portPath: const ThreeAnglePortPath()));
-
         paint.style = PaintingStyle.fill;
-        canvas.drawPath(arrowPath.fromPath(), paint);
+        canvas.drawPath(_path, paint);
         break;
       case ShapeType.line: // 线
-        _path.reset();
-        _path.moveTo(fixedX, fixedY);
-        _path.lineTo(lastX, lastY);
         DashPainter dashPainter = const DashPainter(step: 10, span: 2, pointCount: 3, pointLength: 1);
         dashPainter.paint(canvas, paint, _path);
         break;
