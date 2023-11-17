@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:x_write/model/render/data/paint_state.dart';
+import 'package:x_write/model/render/data/Point.dart';
 
 /// 路径抽象类，生产路径
 abstract class AbsPath {
@@ -13,15 +15,11 @@ class PortPath extends AbsPath {
   final Size size;
   AbsPortPathBuilder portPath;
 
-  PortPath(
-      {required this.center,
-      required this.size,
-      this.portPath = const TrianglePortPath()});
+  PortPath({required this.center, required this.size, this.portPath = const TrianglePortPath()});
 
   @override
   Path fromPath() {
-    Rect zone =
-        Rect.fromCenter(center: center, width: size.width, height: size.height);
+    Rect zone = Rect.fromCenter(center: center, width: size.width, height: size.height);
     // return pathExpand(zone);
     return portPath.fromPathByRect(zone);
   }
@@ -173,10 +171,7 @@ class TrianglePath extends AbsPath {
   Offset leftPoint;
   Offset rightPoint;
 
-  TrianglePath(
-      {required this.fixedPoint,
-      required this.leftPoint,
-      required this.rightPoint});
+  TrianglePath({required this.fixedPoint, required this.leftPoint, required this.rightPoint});
 
   @override
   Path fromPath() => Path()
@@ -264,12 +259,143 @@ class StarPath extends AbsPath {
     path.moveTo(width, halfWidth);
 
     for (double step = 0; step < max; step += degreePreStep) {
-      path.lineTo(halfWidth + wingRadius * cos(step),
-          halfWidth + wingRadius * sin(step));
-      path.lineTo(halfWidth + radius * cos(step + halfDegreePreStep),
-          halfWidth + radius * sin(step + halfDegreePreStep));
+      path.lineTo(halfWidth + wingRadius * cos(step), halfWidth + wingRadius * sin(step));
+      path.lineTo(
+          halfWidth + radius * cos(step + halfDegreePreStep), halfWidth + radius * sin(step + halfDegreePreStep));
     }
 
+    path.close();
+    return path;
+  }
+}
+
+/// 图形绘制及圆中取形
+class ShapeFromCircular extends AbsPath {
+  final ShapeType shapeType;
+  final Point first;
+  final Point last;
+
+  // 多边形边数
+  int polygonCount;
+
+  ShapeFromCircular(
+      {this.shapeType = ShapeType.circle, required this.first, required this.last, this.polygonCount = 5});
+
+  @override
+  Path fromPath() {
+    // 首尾点
+    double firstX = first.x;
+    double firstY = first.y;
+    double lastX = last.x;
+    double lastY = last.y;
+
+    // x,y间距
+    double spaceX = lastX - firstX;
+    double spaceY = lastY - firstY;
+
+    // 中心点
+    Offset center = Offset(firstX + spaceX / 2, firstY + spaceY / 2);
+    switch (shapeType) {
+      case ShapeType.oval:
+        return _oval(center, spaceX.abs(), spaceY.abs());
+      case ShapeType.square:
+        return _square(center, spaceX.abs(), spaceY.abs());
+      // return _square2(center, sqrt(spaceX.abs() * spaceX.abs() + spaceY.abs() * spaceY.abs()) / 2);
+      case ShapeType.regularTriangle:
+        return _triangle(Offset(firstX + spaceX / 2, firstY), Offset(firstX, lastY), Offset(lastX, lastY));
+      case ShapeType.rightTriangle:
+        return _triangle(Offset(firstX, firstY), Offset(firstX, lastY), Offset(lastX, lastY));
+      case ShapeType.star:
+        return _polygon(sqrt(spaceX.abs() * spaceX.abs() + spaceY.abs() * spaceY.abs()) / 2);
+      case ShapeType.polygon:
+        return _polygon(sqrt(spaceX.abs() * spaceX.abs() + spaceY.abs() * spaceY.abs()) / 2);
+      case ShapeType.arrow:
+        return _arrow();
+      case ShapeType.line:
+        return _line();
+      default:
+        return _circle(center, sqrt(spaceX.abs() * spaceX.abs() + spaceY.abs() * spaceY.abs()) / 2);
+    }
+  }
+
+  // 椭圆
+  Path _oval(Offset center, double width, double height) {
+    Path path = Path();
+    Rect oval = Rect.fromCenter(center: center, width: width, height: height);
+    path.addOval(oval);
+    return path;
+  }
+
+  // 矩形
+  Path _square(Offset center, double width, double height) {
+    Path path = Path();
+    Rect square = Rect.fromCenter(center: center, width: width, height: height);
+    path.addRect(square);
+    return path;
+  }
+
+  // 圆角矩形
+  Path _square2(Offset center, double radius) {
+    Path path = Path();
+    RRect square = RRect.fromRectAndRadius(Rect.fromCircle(center: center, radius: radius), const Radius.circular(10));
+    path.addRRect(square);
+    return path;
+  }
+
+  // 三角形
+  Path _triangle(Offset fixed, Offset left, Offset right) => Path()
+    ..moveTo(fixed.dx, fixed.dy)
+    ..lineTo(left.dx, left.dy)
+    ..lineTo(right.dx, right.dy)
+    ..close();
+
+  // 箭头
+  Path _arrow() {
+    Size portSize = const Size(10, 10);
+    ArrowPath arrowPath = ArrowPath(
+        head: PortPath(center: Offset(first.x, first.y), size: portSize, portPath: const NullPortPath()),
+        tail: PortPath(center: Offset(last.x, last.y), size: portSize, portPath: const ThreeAnglePortPath()));
+    Path path = Path();
+    path.addPath(arrowPath.fromPath(), Offset.zero);
+    return path;
+  }
+
+  // 线
+  Path _line() => Path()
+    ..moveTo(first.x, first.y)
+    ..lineTo(last.x, last.y);
+
+  // 圆
+  Path _circle(Offset center, double radius) {
+    Path path = Path();
+    Rect circle = Rect.fromCircle(center: center, radius: radius);
+    path.addOval(circle);
+    return path;
+  }
+
+  /// 多边形
+  /// sin(0) = 0       cos(0) = 1       tan(0) = 0       cot0 = error
+  /// sin(30) = 0.5    cos(30) = √3/2   tan(30) = √3/3   cot30 = √3
+  /// sin(45) = √2/2   cos(45) = √2/2   tan(45) = 1      cot45 = 1
+  /// sin(60) = √3/2   cos(60) = 1/2    tan(60) = √3     cot60 = √3/3
+  Path _polygon(double radius) {
+    // 默认上下对称，奇数多边形视觉效果不对称，逆时针旋转90°保证视觉对称
+    bool isOdd = polygonCount % 2 == 1;
+    double rotate = -pi / 2;
+    List<Offset> points = [];
+    for (int i = 0; i < polygonCount; i++) {
+      double perRad = 2 * pi / polygonCount * i;
+
+      // 计算时加旋转量保证视觉对称(奇数)，偶数不需要
+      double x = isOdd ? radius * cos(perRad + rotate) : radius * cos(perRad);
+      double y = isOdd ? radius * sin(perRad + rotate) : radius * sin(perRad);
+      points.add(Offset(x, y));
+    }
+    Path path = Path();
+    path.moveTo(points[0].dx, points[0].dy);
+    for (int i = 1; i < points.length; i++) {
+      path.lineTo(points[i].dx, points[i].dy);
+    }
     path.close();
     return path;
   }
