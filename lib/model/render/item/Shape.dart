@@ -90,13 +90,15 @@ class Shape {
         canvas.drawPath(_path, paint);
         break;
       case ShapeType.star: // 五角星
-        _path.reset();
-        StarPath starPath = StarPath(first: Offset(fixedX, fixedY), size: Size(width, height));
-        _path.addPath(starPath.fromPath(), Offset.zero);
+        canvas.save();
+        canvas.translate(fixedX + spaceX / 2, fixedY + spaceY / 2);
+        // _path.reset();
+        // StarPath starPath = StarPath(first: Offset(fixedX, fixedY), size: Size(width, height));
+        // _path.addPath(starPath.fromPath(), Offset.zero);
         canvas.drawPath(_path, paint);
+        canvas.restore();
         break;
       case ShapeType.polygon: // 多边形
-        // _path.reset();
         // PolygonPath polygonPath = PolygonPath(first: Offset(fixedX, fixedY), size: Size(spaceX, spaceY), factor: 3);
         // _path.addPath(polygonPath.fromPath(), Offset.zero);
         canvas.save();
