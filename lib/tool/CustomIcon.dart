@@ -34,7 +34,7 @@ class CustomIcon {
   static const IconData tool_shape_cylinder = IconData(0xec73, fontFamily: 'customIcon', matchTextDirection: true);
   static const IconData tool_shape_pyramid = IconData(0xe6cf, fontFamily: 'customIcon', matchTextDirection: true);
 
-  static const IconData tool_function_text = IconData(0xe602, fontFamily: 'customIcon', matchTextDirection: true);
+  static const IconData tool_function_text = IconData(0xe603, fontFamily: 'customIcon', matchTextDirection: true);
   static const IconData tool_function_table = IconData(0xe615, fontFamily: 'customIcon', matchTextDirection: true);
   static const IconData tool_function_mind_mapping = IconData(0xe618, fontFamily: 'customIcon', matchTextDirection: true);
   static const IconData tool_function_doc = IconData(0xe520, fontFamily: 'customIcon', matchTextDirection: true);
