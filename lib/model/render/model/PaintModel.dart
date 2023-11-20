@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/Point.dart';
 import 'package:x_write/model/render/item/line_expand.dart';
@@ -49,6 +47,7 @@ class PaintModel extends ChangeNotifier {
     switch (opType) {
       case OpType.pen:
         // 钢笔画线
+        _doneLineState();
         Line line = Line(color: color, strokeWidth: strokeWidth, lineRender: const Pen());
         _lines.add(line);
         Point point = Point.fromOffset(details.localPosition);
@@ -56,6 +55,7 @@ class PaintModel extends ChangeNotifier {
         break;
       case OpType.highlight:
         // 荧光笔画线
+        _doneLineState();
         Line line = Line(color: color, strokeWidth: strokeWidth, lineRender: const Highlight());
         _lines.add(line);
         Point point = Point.fromOffset(details.localPosition);
@@ -63,6 +63,7 @@ class PaintModel extends ChangeNotifier {
         break;
       case OpType.pencil:
         // 铅笔画线
+        _doneLineState();
         Line line = Line(color: color, strokeWidth: strokeWidth, lineRender: const Pencil());
         _lines.add(line);
         Point point = Point.fromOffset(details.localPosition);
@@ -70,6 +71,7 @@ class PaintModel extends ChangeNotifier {
         break;
       case OpType.brush:
         // 毛笔画线
+        _doneLineState();
         Line line = Line(color: color, strokeWidth: strokeWidth, lineRender: const Brush());
         _lines.add(line);
         Point point = Point.fromOffset(details.localPosition);
@@ -89,8 +91,6 @@ class PaintModel extends ChangeNotifier {
   void pushPointItem(Point point, {bool force = false}) {
     switch (opType) {
       case OpType.pen:
-        pushPointLine(point, force: true);
-        break;
       case OpType.highlight:
       case OpType.pencil:
       case OpType.brush:
@@ -300,5 +300,10 @@ class PaintModel extends ChangeNotifier {
 
     /// 通知画板重绘，避免setState对组件重构
     notifyListeners();
+  }
+
+  void _doneLineState() {
+    if (_lines.isEmpty) return;
+    _lines.forEach((line) { line?.state = PaintState.done; });
   }
 }
