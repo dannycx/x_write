@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/paint_state.dart';
 import 'package:x_write/model/render/data/write_value_notifier.dart';
@@ -181,6 +182,7 @@ class _HomePageState extends State<HomePage> {
 
   void _onToolAi() {
     print('_onToolDecoration');
+    _pickFile();
   }
 
   void _onToolShape() {
@@ -224,5 +226,21 @@ class _HomePageState extends State<HomePage> {
       _penPropPageVisible = false;
       _shapePropPageVisible = false;
     });
+  }
+
+  void _pickFile() async {
+    //打开存储以拾取文件和拾取的一个或多个文件
+    //被分配到结果中，如果没有选择文件，则结果为null。
+    //您还可以根据需要切换“allowMultiple”true或false
+    final result = await FilePicker.platform.pickFiles(allowMultiple: false);
+
+    //如果未拾取文件
+    if (result == null) return;
+
+    //我们将记录
+    //第一个拾取的文件（如果选择了多个）
+    print('name: ${result.files.first.name}');
+    print('size: ${result.files.first.size}');
+    print('path: ${result.files.first.path}');
   }
 }
