@@ -306,7 +306,7 @@ class ShapeFromCircular extends AbsPath {
       case ShapeType.rightTriangle:
         return _triangle(Offset(firstX, firstY), Offset(firstX, lastY), Offset(lastX, lastY));
       case ShapeType.star:
-        return _polygon(sqrt(spaceX.abs() * spaceX.abs() + spaceY.abs() * spaceY.abs()) / 2);
+        return _star(sqrt(spaceX.abs() * spaceX.abs() + spaceY.abs() * spaceY.abs()));
       case ShapeType.polygon:
         return _polygon(sqrt(spaceX.abs() * spaceX.abs() + spaceY.abs() * spaceY.abs()) / 2);
       case ShapeType.arrow:
@@ -395,6 +395,45 @@ class ShapeFromCircular extends AbsPath {
     path.moveTo(points[0].dx, points[0].dy);
     for (int i = 1; i < points.length; i++) {
       path.lineTo(points[i].dx, points[i].dy);
+    }
+    path.close();
+    return path;
+  }
+
+  /// n角星
+  /// diameter：直径
+  Path _star(double diameter) {
+    double outRadius = diameter / 2;
+    double innerRadius = diameter / 4;
+
+    List<Offset> outPoints = [];
+    double rotate = -pi / 2;
+    bool isOdd = polygonCount % 2 == 1;
+    for (int i = 0; i < polygonCount; i++) {
+      // 计算时加旋转量保证视觉对称(奇数)，偶数不需要
+      double perRad = 2 * pi / polygonCount * i;
+      double x = isOdd ? outRadius * cos(perRad + rotate) : outRadius * cos(perRad);
+      double y = isOdd ? outRadius * sin(perRad + rotate) : outRadius * sin(perRad);
+      outPoints.add(Offset(x, y));
+    }
+
+    List<Offset> innerPoints = [];
+    double offset = pi / polygonCount;
+    for (int i = 0; i < polygonCount; i++) {
+      double perRad = 2 * pi / polygonCount * i;
+      double x = isOdd ? innerRadius * cos(perRad + rotate + offset) : innerRadius * cos(perRad + offset);
+      double y = isOdd ? innerRadius * sin(perRad + rotate + offset) : innerRadius * sin(perRad + offset);
+      innerPoints.add(Offset(x, y));
+    }
+    for (int i = 0; i < polygonCount; i++) {
+      outPoints.insert(2 * i + 1, innerPoints[i]);
+    }
+
+    Path path = Path();
+    path.moveTo(outPoints[0].dx, outPoints[0].dy);
+    for (int i = 1; i < outPoints.length; i++) {
+      Offset offset = outPoints[i];
+      path.lineTo(offset.dx, offset.dy);
     }
     path.close();
     return path;
