@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/paint_state.dart';
 
 import '../../tool/CustomIcon.dart';
-import '../data/ItemInsertData.dart';
+import '../data/item_insert_data.dart';
 
 /// 回调
 typedef InsertPropCallback = void Function(OpType opType);
