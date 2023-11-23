@@ -129,6 +129,7 @@ class _WritingPageState extends State<WritingPage> {
 
   // 创建Line,pushLine添加至PaintModel中
   void _initItemDate(DragDownDetails details) {
+    eventBus.fire(CommonTypeEvent(commonType: CommonType.touch_down));
     model.pushItem(details, opType, shapeType, lineColor, strokeWidth);
     // Line line = Line(color: lineColor, strokeWidth: strokeWidth);
     // model.pushLine(line);
