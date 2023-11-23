@@ -43,6 +43,13 @@ dependencies:
   dio: ^5.3.3
   # 定位
   location: ^5.0.0
+  geocode: ^1.0.3
+  # geolocator: ^10.1.0
+  # webview
+  webview_flutter: ^4.4.2
+  # 加密算法
+  crypto: ^3.0.3
+  convert: ^3.1.1
 
 dev_dependencies:
   flutter_test:
