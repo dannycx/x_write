@@ -1,9 +1,11 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:x_write/model/net/ui/weather_page.dart';
 import 'package:x_write/model/render/data/paint_state.dart';
 import 'package:x_write/model/render/data/write_value_notifier.dart';
 import 'package:x_write/tool/CommonTool.dart';
 import 'package:x_write/ui/WritingPage.dart';
+import 'package:x_write/ui/prop/InsertPropPage.dart';
 import 'package:x_write/ui/prop/PenPropPage.dart';
 import 'package:x_write/ui/prop/ShapePropPage.dart';
 import 'package:x_write/ui/tool_bar.dart';
@@ -24,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   /// 是否显示工具属性page
   bool _penPropPageVisible = false;
   bool _shapePropPageVisible = false;
+  bool _insertPropPageVisible = false;
 
   @override
   void initState() {
@@ -32,6 +35,8 @@ class _HomePageState extends State<HomePage> {
 
     // 全屏显示
     // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+
+    eventBus.on<CommonTypeEvent>().listen((commonType) { _commonTypeEvent(commonType.commonType); });
     super.initState();
   }
 
@@ -51,6 +56,8 @@ class _HomePageState extends State<HomePage> {
             _rightTool(),
             _penPropPage(),
             _shapePropPage(),
+            _insertPropPage(),
+            _weatherWidget(),
           ],
         ),
       ),
@@ -164,6 +171,46 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
+  Widget _insertPropPage() {
+    return Visibility(
+        // 显示隐藏
+        visible: _insertPropPageVisible,
+        // 隐藏时是否保持占位
+        maintainState: false,
+        // 隐藏时是否保存动态状态
+        maintainAnimation: false,
+        // 隐藏时是否保存子组件所占空间大小，不会消耗过多的性能
+        maintainSize: false,
+        child: Positioned(
+          width: 316,
+          height: 60,
+          left: _x,
+          top: height - 116,
+          child: InsertPropPage(
+            onToolInsertProp: _onToolInsertProp,
+          ),
+        ));
+  }
+
+  _weatherWidget() {
+    return const Visibility(
+      // 显示隐藏
+        visible: true,
+        // 隐藏时是否保持占位
+        maintainState: false,
+        // 隐藏时是否保存动态状态
+        maintainAnimation: false,
+        // 隐藏时是否保存子组件所占空间大小，不会消耗过多的性能
+        maintainSize: false,
+        child: Positioned(
+          width: 200,
+          height: 200,
+          right: 0,
+          top: 0,
+          child: WeatherPage(),
+        ));
+  }
+
   void _onToolMenu() {
     print('_onToolMenu');
   }
@@ -198,7 +245,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onToolLayer() {
-    eventBus.fire(OpTypeEvent(opType: OpType.shape));
+    _hidePropPage();
+    setState(() {
+      _insertPropPageVisible = true;
+    });
   }
 
   void _onToolEraser() {
@@ -221,10 +271,16 @@ class _HomePageState extends State<HomePage> {
     eventBus.fire(ShapeTypeEvent(shapeType: shapeType));
   }
 
+  _onToolInsertProp(OpType opType) {
+    print('_onToolInsertProp opType: $opType');
+    eventBus.fire(OpTypeEvent(opType: opType));
+  }
+
   void _hidePropPage() {
     setState(() {
       _penPropPageVisible = false;
       _shapePropPageVisible = false;
+      _insertPropPageVisible = false;
     });
   }
 
@@ -242,5 +298,15 @@ class _HomePageState extends State<HomePage> {
     print('name: ${result.files.first.name}');
     print('size: ${result.files.first.size}');
     print('path: ${result.files.first.path}');
+  }
+
+  void _commonTypeEvent(CommonType commonType) {
+    switch(commonType) {
+      case CommonType.touch_down:
+        _hidePropPage();
+        break;
+      default:
+        break;
+    }
   }
 }
