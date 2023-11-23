@@ -1,11 +1,11 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:x_write/model/net/ui/weather_page.dart';
+// import 'package:x_write/model/net/ui/weather_page.dart';
 import 'package:x_write/model/render/data/paint_state.dart';
 import 'package:x_write/model/render/data/write_value_notifier.dart';
 import 'package:x_write/tool/CommonTool.dart';
 import 'package:x_write/ui/WritingPage.dart';
-import 'package:x_write/ui/prop/InsertPropPage.dart';
+import 'package:x_write/ui/prop/insert_prop_page.dart';
 import 'package:x_write/ui/prop/PenPropPage.dart';
 import 'package:x_write/ui/prop/ShapePropPage.dart';
 import 'package:x_write/ui/tool_bar.dart';
@@ -207,7 +207,7 @@ class _HomePageState extends State<HomePage> {
           height: 200,
           right: 0,
           top: 0,
-          child: WeatherPage(),
+          child: Text('data'),
         ));
   }
 
