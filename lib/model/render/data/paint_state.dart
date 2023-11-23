@@ -9,5 +9,10 @@ enum ShapeType {
 
 /// 操作类型：
 enum OpType {
-  pen, pencil, highlight, brush, shape
+  pen, pencil, highlight, brush, shape, image, text, doc, video
+}
+
+/// 通用事件类型
+enum CommonType {
+  touch_down
 }
