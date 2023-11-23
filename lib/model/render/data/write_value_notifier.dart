@@ -31,3 +31,10 @@ class PenPropEvent {
 
   PenPropEvent({required this.color, this.thickness = 3.0});
 }
+
+/// 通用类型事件
+class CommonTypeEvent {
+  CommonType commonType;
+
+  CommonTypeEvent({required this.commonType});
+}
