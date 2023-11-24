@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:x_write/tool/CommonTool.dart';
 
 import 'ui/HomePage.dart';
 
 void main() {
+  // 确定初始化
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 设备横屏显示
+  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+
+  // 全屏
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
   runApp(const MyApp());
 }
 
