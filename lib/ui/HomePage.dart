@@ -1,6 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-// import 'package:x_write/model/net/ui/weather_page.dart';
+import 'package:x_write/model/net/ui/weather_page.dart';
 import 'package:x_write/model/render/data/paint_state.dart';
 import 'package:x_write/model/render/data/write_value_notifier.dart';
 import 'package:x_write/tool/CommonTool.dart';
@@ -9,6 +9,8 @@ import 'package:x_write/ui/prop/insert_prop_page.dart';
 import 'package:x_write/ui/prop/PenPropPage.dart';
 import 'package:x_write/ui/prop/ShapePropPage.dart';
 import 'package:x_write/ui/tool_bar.dart';
+
+import '../model/net/ui/search_image.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -58,6 +60,7 @@ class _HomePageState extends State<HomePage> {
             _shapePropPage(),
             _insertPropPage(),
             _weatherWidget(),
+            _SearchImageWidget(),
           ],
         ),
       ),
@@ -207,7 +210,26 @@ class _HomePageState extends State<HomePage> {
           height: 200,
           right: 0,
           top: 0,
-          child: Text('data'),
+          child: WeatherPage(),
+        ));
+  }
+
+  _SearchImageWidget() {
+    return const Visibility(
+      // 显示隐藏
+        visible: true,
+        // 隐藏时是否保持占位
+        maintainState: false,
+        // 隐藏时是否保存动态状态
+        maintainAnimation: false,
+        // 隐藏时是否保存子组件所占空间大小，不会消耗过多的性能
+        maintainSize: false,
+        child: Positioned(
+          width: 200,
+          height: 800,
+          left: 10,
+          top: 10,
+          child: SearchImage(),
         ));
   }
 
@@ -274,6 +296,13 @@ class _HomePageState extends State<HomePage> {
   _onToolInsertProp(OpType opType) {
     print('_onToolInsertProp opType: $opType');
     eventBus.fire(OpTypeEvent(opType: opType));
+    switch(opType) {
+      case OpType.image:
+        _pickFile();
+        break;
+      default:
+        break;
+    }
   }
 
   void _hidePropPage() {
