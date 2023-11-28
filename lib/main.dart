@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:x_write/model/net/http_util.dart';
+import 'package:x_write/model/net/sp_tool.dart';
 import 'package:x_write/tool/CommonTool.dart';
 
 import 'ui/HomePage.dart';
 
-void main() {
+Future<void> main() async {
   // 确定初始化
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -13,7 +15,13 @@ void main() {
 
   // 全屏
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+  // await initStore();
   runApp(const MyApp());
+}
+
+Future<void> initStore() async {
+  await SpUtil().init();
+  HttpUtils.init(baseUrl: '');
 }
 
 class MyApp extends StatelessWidget {
