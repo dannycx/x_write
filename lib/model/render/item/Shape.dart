@@ -17,10 +17,10 @@ class Shape {
   ShapeType shapeType;
 
   // 记录该线进入编辑状态时的路径，通过record()赋值，translate()通过偏移量offset更新路径，实现移动效果
-  Rect? _recordRect;
+  Path? _recordPath;
 
   // 绘制路径
-  Rect? _shapeRect = Rect.fromCenter(center: const Offset(0, 0), width: 0, height: 0);
+  Rect _shapeRect = Rect.fromCenter(center: const Offset(0, 0), width: 0, height: 0);
 
   // 绘制路径
   final Path _path = Path();
@@ -33,13 +33,15 @@ class Shape {
 
   // 赋值_recordPath
   void record() {
-    _recordRect = _shapeRect?.shift(Offset.zero);
+    _recordPath = _path.shift(Offset.zero);
   }
 
   // 通过偏移量offset更新路径，实现移动效果
   void translate(Offset offset) {
-    if (_recordRect == null) return;
-    _shapeRect = _recordRect!.shift(offset);
+    if (_recordPath == null) return;
+    _path.reset();
+    _path.addPath(_recordPath!.shift(offset), Offset.zero);
+    // _shapeRect = _path.getBounds();
   }
 
   Rect? rect() => _shapeRect;
@@ -67,19 +69,12 @@ class Shape {
     double spaceY = lastY - fixedY;
 
     if (state == PaintState.doing) {
-      _shapeRect = fromRect();
+      // _shapeRect = fromRect();
       _path.reset();
       ShapeFromCircular shapeFromCircular = ShapeFromCircular(shapeType: shapeType, first: firstPoint, last: lastPoint);
       _path.addPath(shapeFromCircular.fromPath(), Offset.zero);
     }
-
-    double width = _shapeRect?.width ?? 0;
-    double height = _shapeRect?.height ?? 0;
-    if (width == 0 || height == 0) return;
-
-    double left = _shapeRect?.left ?? 0;
-    double top = _shapeRect?.top ?? 0;
-    double radius = width / 2;
+    _shapeRect = _path.getBounds();
 
     switch (shapeType) {
       case ShapeType.circle: // 圆
@@ -96,6 +91,7 @@ class Shape {
         // StarPath starPath = StarPath(first: Offset(fixedX, fixedY), size: Size(width, height));
         // _path.addPath(starPath.fromPath(), Offset.zero);
         canvas.drawPath(_path, paint);
+        _shapeRect = _shapeRect.shift(Offset(fixedX + spaceX / 2, fixedY + spaceY / 2));
         canvas.restore();
         break;
       case ShapeType.polygon: // 多边形
@@ -103,6 +99,7 @@ class Shape {
         // _path.addPath(polygonPath.fromPath(), Offset.zero);
         canvas.save();
         canvas.translate(fixedX + spaceX / 2, fixedY + spaceY / 2);
+        _shapeRect = _shapeRect.shift(Offset(fixedX + spaceX / 2, fixedY + spaceY / 2));
         canvas.drawPath(_path, paint);
         canvas.restore();
         break;
@@ -117,6 +114,14 @@ class Shape {
       default:
         break;
     }
+
+    double width = _shapeRect.width;
+    double height = _shapeRect.height;
+    if (width == 0 || height == 0) return;
+
+    double left = _shapeRect.left;
+    double top = _shapeRect.top;
+    double radius = width / 2;
 
     if (state == PaintState.edit) {
       Paint editPaint = Paint()
@@ -136,12 +141,16 @@ class Shape {
           break;
       }
 
-      canvas.drawRect(
-          Rect.fromCenter(
-              center: Offset(left + radius, top + radius),
-              width: editWidth + strokeWidth,
-              height: editHeight + strokeWidth),
-          editPaint);
+      Rect rect = Rect.fromCenter(
+          center: Offset(left + radius, top + radius),
+          width: editWidth + strokeWidth,
+          height: editHeight + strokeWidth);
+      // canvas.drawRect(rect, editPaint);
+
+      Path editPath = Path();
+      editPath.addRect(rect);
+      DashPainter dashPainter = const DashPainter(step: 3, span: 3, pointCount: 1, pointLength: 1);
+      dashPainter.paint(canvas, editPaint, editPath);
     }
   }
 
