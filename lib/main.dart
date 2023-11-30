@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:x_write/model/net/http_util.dart';
-import 'package:x_write/model/net/sp_tool.dart';
+// import 'package:x_write/model/net/http_util.dart';
+// import 'package:x_write/model/net/sp_tool.dart';
 import 'package:x_write/tool/CommonTool.dart';
 
 import 'ui/HomePage.dart';
@@ -20,8 +20,8 @@ Future<void> main() async {
 }
 
 Future<void> initStore() async {
-  await SpUtil().init();
-  HttpUtils.init(baseUrl: '');
+  // await SpUtil().init();
+  // HttpUtils.init(baseUrl: '');
 }
 
 class MyApp extends StatelessWidget {
