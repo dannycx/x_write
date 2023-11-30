@@ -8,9 +8,18 @@ import 'package:x_write/model/render/painter/Painter.dart';
 import 'package:x_write/ui/prop/confirm_dialog.dart';
 import 'package:x_write/ui/prop/paint_setting_dialog.dart';
 
+/// 拖拽事件
+typedef PanDownCallback = void Function(DragDownDetails details);
+typedef PanUpdateCallback = void Function(DragUpdateDetails details);
+typedef PanEndCallback = void Function(DragEndDetails details);
+
 /// 书写组件
 class WritingPage extends StatefulWidget {
-  const WritingPage({super.key});
+  final PanDownCallback panDownCallback;
+  final PanUpdateCallback panUpdateCallback;
+  final PanEndCallback panEndCallback;
+
+  const WritingPage(this.panDownCallback, this.panUpdateCallback, this.panEndCallback, {Key? key}): super(key: key);
 
   @override
   _WritingPageState createState() => _WritingPageState();
@@ -83,13 +92,13 @@ class _WritingPageState extends State<WritingPage> {
   Widget build(BuildContext context) {
     return GestureDetector(
       /// 按下
-      onPanDown: _initItemDate,
+      onPanDown: _onPanDown,
 
       /// 拖动收集点
-      onPanUpdate: _collectPoint,
+      onPanUpdate: _onPanUpdate,
 
       /// 拖动结束
-      onPanEnd: _doneItem,
+      onPanEnd: _onPanEnd,
 
       /// 拖动取消
       onPanCancel: _cancel,
@@ -125,6 +134,39 @@ class _WritingPageState extends State<WritingPage> {
     model.dispose();
     eventBus.destroy();
     super.dispose();
+  }
+
+  void _onPanDown(DragDownDetails details) {
+    switch (opType) {
+      case OpType.magnifier:
+        widget.panDownCallback(details);
+        break;
+      default:
+        _initItemDate(details);
+        break;
+    }
+  }
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    switch (opType) {
+      case OpType.magnifier:
+        widget.panUpdateCallback(details);
+        break;
+      default:
+        _collectPoint(details);
+        break;
+    }
+  }
+
+  void _onPanEnd(DragEndDetails details) {
+    switch (opType) {
+      case OpType.magnifier:
+        widget.panEndCallback(details);
+        break;
+      default:
+        _doneItem(details);
+        break;
+    }
   }
 
   // 创建Line,pushLine添加至PaintModel中
