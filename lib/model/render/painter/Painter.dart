@@ -18,7 +18,7 @@ class Painter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    coordinate.render(canvas, size);
+    // coordinate.render(canvas, size);
     // _renderOther(canvas, size);
     for (var line in model.lines) {
       line?.render(canvas, _paint);

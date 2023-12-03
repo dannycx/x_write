@@ -41,5 +41,10 @@ class CustomIcon {
   static const IconData tool_function_image = IconData(0xec7d, fontFamily: 'customIcon', matchTextDirection: true);
   static const IconData tool_function_media = IconData(0xe621, fontFamily: 'customIcon', matchTextDirection: true);
 
-
+  static const IconData options_magnifier = IconData(0xe625, fontFamily: 'customIcon', matchTextDirection: true);
+  static const IconData options_screenshot = IconData(0xe795, fontFamily: 'customIcon', matchTextDirection: true);
+  static const IconData options_scan = IconData(0xe8b5, fontFamily: 'customIcon', matchTextDirection: true);
+  static const IconData options_screen_projection = IconData(0xe606, fontFamily: 'customIcon', matchTextDirection: true);
+  static const IconData options_ruler = IconData(0xe697, fontFamily: 'customIcon', matchTextDirection: true);
+  static const IconData options_sticky_note = IconData(0xe8d6, fontFamily: 'customIcon', matchTextDirection: true);
 }

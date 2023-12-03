@@ -1,20 +1,33 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:x_write/model/render/data/paint_state.dart';
 import 'package:x_write/tool/CustomIcon.dart';
+import 'package:x_write/ui/data/pen_prop.dart';
 import 'package:x_write/ui/prop/pen_color_page.dart';
 import 'package:x_write/ui/prop/pen_thickness_page.dart';
 
 /// 回调
-typedef PenPropCallback = Function(OpType penType, Color color, double thickness);
+typedef PenPropCallback = Function(OpType penType, PenProp penProp);
 
 /// 笔属性
 class PenPropPage extends StatefulWidget {
   final PenPropCallback? onToolPenProp;
-  final List<Color> defColor = [Colors.black, Colors.black, Colors.black, Colors.black];
-  final List<double> defThickness = [2.0, 2.0, 2.0, 2.0];
+  final PenProp penProp;
+  final PenProp pencilProp;
+  final PenProp brushProp;
+  final PenProp highlightProp;
   OpType defOpType;
 
-  PenPropPage({Key? key, required this.onToolPenProp, this.defOpType = OpType.pencil}) : super(key: key);
+  PenPropPage(
+      {Key? key,
+      required this.onToolPenProp,
+      this.defOpType = OpType.pencil,
+      required this.penProp,
+      required this.pencilProp,
+      required this.brushProp,
+      required this.highlightProp})
+      : super(key: key);
 
   @override
   State<PenPropPage> createState() => _PenPropPageState();
@@ -24,29 +37,29 @@ class _PenPropPageState extends State<PenPropPage> {
   Color get _defColor {
     switch (widget.defOpType) {
       case OpType.pen:
-        return widget.defColor[1];
+        return widget.penProp.color;
       case OpType.brush:
-        return widget.defColor[2];
+        return widget.brushProp.color;
       case OpType.highlight:
-        return widget.defColor[3];
+        return widget.highlightProp.color;
       default:
-        return widget.defColor[0];
+        return widget.pencilProp.color;
     }
   }
 
   _setColor(color) {
     switch (widget.defOpType) {
       case OpType.pen:
-        widget.defColor[1] = color;
+        widget.penProp.color = color;
         break;
       case OpType.brush:
-        widget.defColor[2] = color;
+        widget.brushProp.color = color;
         break;
       case OpType.highlight:
-        widget.defColor[3] = color;
+        widget.highlightProp.color = color;
         break;
       default:
-        widget.defColor[0] = color;
+        widget.pencilProp.color = color;
         break;
     }
   }
@@ -54,29 +67,29 @@ class _PenPropPageState extends State<PenPropPage> {
   double get _defThickness {
     switch (widget.defOpType) {
       case OpType.pen:
-        return widget.defThickness[1];
+        return widget.penProp.thickness;
       case OpType.brush:
-        return widget.defThickness[2];
+        return widget.brushProp.thickness;
       case OpType.highlight:
-        return widget.defThickness[3];
+        return widget.highlightProp.thickness;
       default:
-        return widget.defThickness[0];
+        return widget.pencilProp.thickness;
     }
   }
 
   _setThickness(thickness) {
     switch (widget.defOpType) {
       case OpType.pen:
-        widget.defThickness[1] = thickness;
+        widget.penProp.thickness = thickness;
         break;
       case OpType.brush:
-        widget.defThickness[2] = thickness;
+        widget.brushProp.thickness = thickness;
         break;
       case OpType.highlight:
-        widget.defThickness[3] = thickness;
+        widget.highlightProp.thickness = thickness;
         break;
       default:
-        widget.defThickness[0] = thickness;
+        widget.pencilProp.thickness = thickness;
         break;
     }
   }
@@ -105,7 +118,8 @@ class _PenPropPageState extends State<PenPropPage> {
           GestureDetector(
               onTap: () {
                 widget.defOpType = OpType.pencil;
-                widget.onToolPenProp?.call(widget.defOpType, widget.defColor[0], widget.defThickness[0]);
+                widget.onToolPenProp?.call(widget.defOpType, widget.pencilProp);
+                setState(() {});
               },
               child: Container(
                 alignment: Alignment.center,
@@ -121,7 +135,8 @@ class _PenPropPageState extends State<PenPropPage> {
           GestureDetector(
               onTap: () {
                 widget.defOpType = OpType.pen;
-                widget.onToolPenProp?.call(widget.defOpType, widget.defColor[1], widget.defThickness[1]);
+                widget.onToolPenProp?.call(widget.defOpType, widget.penProp);
+                setState(() {});
               },
               child: Container(
                 alignment: Alignment.center,
@@ -137,7 +152,8 @@ class _PenPropPageState extends State<PenPropPage> {
           GestureDetector(
               onTap: () {
                 widget.defOpType = OpType.brush;
-                widget.onToolPenProp?.call(widget.defOpType, widget.defColor[2], widget.defThickness[2]);
+                widget.onToolPenProp?.call(widget.defOpType, widget.brushProp);
+                setState(() {});
               },
               child: Container(
                 alignment: Alignment.center,
@@ -153,7 +169,8 @@ class _PenPropPageState extends State<PenPropPage> {
           GestureDetector(
               onTap: () {
                 widget.defOpType = OpType.highlight;
-                widget.onToolPenProp?.call(widget.defOpType, widget.defColor[3], widget.defThickness[3]);
+                widget.onToolPenProp?.call(widget.defOpType, widget.highlightProp);
+                setState(() {});
               },
               child: Container(
                 alignment: Alignment.center,
@@ -208,12 +225,25 @@ class _PenPropPageState extends State<PenPropPage> {
 
   void _onColorSelect(Color color) {
     _setColor(color);
-    widget.onToolPenProp?.call(widget.defOpType, _defColor, _defThickness);
+    widget.onToolPenProp?.call(widget.defOpType, _penProp());
   }
 
   void _onThicknessSelect(double thickness) {
     _setThickness(thickness);
-    widget.onToolPenProp?.call(widget.defOpType, _defColor, _defThickness);
+    widget.onToolPenProp?.call(widget.defOpType, _penProp());
+  }
+
+  _penProp() {
+    switch (widget.defOpType) {
+      case OpType.pencil:
+        return widget.pencilProp;
+      case OpType.pen:
+        return widget.penProp;
+      case OpType.brush:
+        return widget.brushProp;
+      default:
+        return widget.highlightProp;
+    }
   }
 }
 

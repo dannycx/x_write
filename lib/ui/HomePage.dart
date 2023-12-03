@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:x_write/model/net/ui/weather_page.dart';
 import 'package:x_write/model/options/ui/timer.dart';
 import 'package:x_write/model/render/data/paint_state.dart';
@@ -9,6 +12,7 @@ import 'package:x_write/model/render/data/write_value_notifier.dart';
 import 'package:x_write/tool/CommonTool.dart';
 import 'package:x_write/tool/file_tool.dart';
 import 'package:x_write/ui/WritingPage.dart';
+import 'package:x_write/ui/data/pen_prop.dart';
 import 'package:x_write/ui/prop/insert_prop_page.dart';
 import 'package:x_write/ui/prop/PenPropPage.dart';
 import 'package:x_write/ui/prop/ShapePropPage.dart';
@@ -25,6 +29,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // 截图
+  GlobalKey rootWidgetKey = GlobalKey();
+
   double _x = (CommonTool.width - 260) / 2;
   double _y = 0;
   final double width = CommonTool.width;
@@ -32,11 +39,18 @@ class _HomePageState extends State<HomePage> {
 
   // 操作类型
   OpType curOpType = OpType.pen;
+  OpType curPenType = OpType.pen;
 
   // 放大镜参数：大小，位置，是否显示
   final Size magnifierSize = const Size(120, 120);
-  Offset _dragMagnifierPostion = Offset.zero;
+  Offset _dragMagnifierPosition = Offset.zero;
   bool _magnifierVisible = false;
+
+  // 笔属性
+  final PenProp penProp = PenProp();
+  final PenProp pencilProp = PenProp();
+  final PenProp brushProp = PenProp();
+  final PenProp highlightProp = PenProp();
 
   /// 是否显示工具属性page
   bool _penPropPageVisible = false;
@@ -67,24 +81,28 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Overlay.of(context).insert(_enetry());
     });
-    return Scaffold(
-      body: ConstrainedBox(
-        constraints: const BoxConstraints.expand(),
-        // 通过ConstrainedBox来确保Stack占满屏幕
-        child: Stack(
-          children: [
-            WritingPage(_panDown, _panUpdate, _panEnd),
-            _leftTool(),
-            _rightTool(),
-            _penPropPage(),
-            _shapePropPage(),
-            _insertPropPage(),
-            _optionsPage(), // 更多操作项
-            _weatherWidget(), // 天气
-            _searchImageWidget(), // 搜图
-            _timerWidget(), // 计时器
-            _magnifier(), // 放大镜
-          ],
+    return RepaintBoundary(
+      key: rootWidgetKey,
+      child: Scaffold(
+        body: ConstrainedBox(
+          constraints: const BoxConstraints.expand(),
+          // 通过ConstrainedBox来确保Stack占满屏幕
+          child: Stack(
+            children: [
+              WritingPage(_panDown, _panUpdate, _panEnd),
+              _leftTool(),
+              _rightTool(),
+              _penPropPage(),
+              _shapePropPage(),
+              _insertPropPage(),
+              _optionsPage(), // 更多操作项
+              _weatherWidget(), // 天气
+              _searchImageWidget(), // 搜图
+              _timerWidget(), // 计时器
+              _magnifier(), // 放大镜
+              ClipRect(child: context.findAncestorWidgetOfExactType<Scaffold>(),)
+            ],
+          ),
         ),
       ),
     );
@@ -168,10 +186,12 @@ class _HomePageState extends State<HomePage> {
           left: _x,
           top: height - 90,
           child: PenPropPage(
-            onToolPenProp: (penType, color, thickness) {
-              eventBus.fire(OpTypeEvent(opType: penType));
-              eventBus.fire(PenPropEvent(color: color, thickness: thickness));
-            },
+            penProp: penProp,
+            pencilProp: penProp,
+            brushProp: brushProp,
+            highlightProp: highlightProp,
+            defOpType: curOpType,
+            onToolPenProp: _onToolPenProp,
           ),
         ));
   }
@@ -297,7 +317,7 @@ class _HomePageState extends State<HomePage> {
 
   _magnifier() {
     return Visibility(
-      // 显示隐藏
+        // 显示隐藏
         visible: _magnifierVisible,
         // 隐藏时是否保持占位
         maintainState: false,
@@ -306,12 +326,10 @@ class _HomePageState extends State<HomePage> {
         // 隐藏时是否保存子组件所占空间大小，不会消耗过多的性能
         maintainSize: false,
         child: Positioned(
-          left: _dragMagnifierPostion.dx,
-          top: _dragMagnifierPostion.dy,
+          left: _dragMagnifierPosition.dx,
+          top: _dragMagnifierPosition.dy,
           child: RawMagnifier(
-            decoration: const MagnifierDecoration(
-                shape: CircleBorder(side: BorderSide(color: Colors.blue, width: 2))
-            ),
+            decoration: const MagnifierDecoration(shape: CircleBorder(side: BorderSide(color: Colors.blue, width: 2))),
             size: magnifierSize,
             magnificationScale: 2, // 放大倍数
           ),
@@ -327,17 +345,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onToolStylus() {
-    curOpType = OpType.pencil;
     _hidePropPage();
     setState(() {
       _penPropPageVisible = true;
     });
-    eventBus.fire(OpTypeEvent(opType: OpType.pencil));
+    eventBus.fire(OpTypeEvent(opType: curPenType));
   }
 
   void _onToolAi() {
     print('_onToolAi');
     curOpType = OpType.ai;
+    // _captureImage().then((value) => fileTool.imageUint8ListWrite(value));
   }
 
   void _onToolShape() {
@@ -382,6 +400,32 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _optionsPageVisible = true;
     });
+  }
+
+  _onToolPenProp(OpType penType, PenProp prop) {
+    curPenType = penType;
+    curOpType = penType;
+    switch (penType) {
+      case OpType.pencil:
+        pencilProp.color = prop.color;
+        pencilProp.thickness = prop.thickness;
+        break;
+      case OpType.brush:
+        brushProp.color = prop.color;
+        brushProp.thickness = prop.thickness;
+        break;
+      case OpType.highlight:
+        highlightProp.color = prop.color;
+        highlightProp.thickness = prop.thickness;
+        break;
+      default:
+        penProp.color = prop.color;
+        penProp.thickness = prop.thickness;
+        break;
+    }
+
+    eventBus.fire(OpTypeEvent(opType: curOpType));
+    eventBus.fire(PenPropEvent(color: prop.color, thickness: prop.thickness));
   }
 
   _onToolShapeProp(ShapeType shapeType) {
@@ -457,7 +501,7 @@ class _HomePageState extends State<HomePage> {
   void _panDown(DragDownDetails details) {
     switch (curOpType) {
       case OpType.magnifier:
-        _dragMagnifierPostion = details.localPosition - Offset(magnifierSize.width / 2, magnifierSize.height / 2);
+        _dragMagnifierPosition = details.localPosition - Offset(magnifierSize.width / 2, magnifierSize.height / 2);
         _magnifierVisible = true;
         setState(() {});
         break;
@@ -470,7 +514,7 @@ class _HomePageState extends State<HomePage> {
   void _panUpdate(DragUpdateDetails details) {
     switch (curOpType) {
       case OpType.magnifier:
-        _dragMagnifierPostion = details.localPosition - Offset(magnifierSize.width / 2, magnifierSize.height / 2);
+        _dragMagnifierPosition = details.localPosition - Offset(magnifierSize.width / 2, magnifierSize.height / 2);
         _magnifierVisible = true;
         setState(() {});
         break;
@@ -488,6 +532,21 @@ class _HomePageState extends State<HomePage> {
       default:
         break;
     }
+  }
+
+  Future<Uint8List?> _captureImage() async {
+    try {
+      RenderRepaintBoundary? boundary = rootWidgetKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+
+      // 当前屏幕像素比3.0
+      double pixelRatio = ui.window.devicePixelRatio;
+      var image = await boundary?.toImage(pixelRatio: pixelRatio);
+      ByteData? byteData = await image?.toByteData(format: ui.ImageByteFormat.png);
+      return byteData?.buffer.asUint8List(); // 图片数据
+    } catch(e) {
+      print('_captureImage: ${e.toString()}');
+    }
+    return null;
   }
 
   void _pickFile() async {

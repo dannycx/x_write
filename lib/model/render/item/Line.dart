@@ -65,8 +65,8 @@ class Line {
     }
 
     /// 贝塞尔绘制
-    canvas.drawPath(_linePath, paint);
-    // lineRender.drawLine(canvas, paint, points);
+    // canvas.drawPath(_linePath, paint);
+    lineRender.drawLine(canvas, paint, points);
 
     // 辅助线
     Path p1 = _linePath.shift(Offset(paint.strokeWidth / 2, paint.strokeWidth / 2));
